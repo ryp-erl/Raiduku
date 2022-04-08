@@ -1,6 +1,6 @@
 # Raiduku
 
-Minimalist World of Warcraft addon to help raid leaders with managing loots and prios in Burning Crusade Classic.
+Minimalist World of Warcraft addon to help raid leaders managing loots and prios in Burning Crusade Classic.
 
 ## Why this addon?
 
