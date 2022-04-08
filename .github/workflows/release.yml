@@ -27,12 +27,15 @@ jobs:
     name: Publish Zip
     runs-on: ubuntu-latest
     steps:
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Zip
-        run: zip -r ${{ github.event.repository.name }}-${{ github.ref }}.zip .
+        run: zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip .
       - name: Upload Zip
         id: upload_zip
         uses: actions/upload-release-asset@v1
@@ -40,8 +43,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ${{ github.event.repository.name }}-${{ github.ref }}.zip
-          asset_name: ${{ github.event.repository.name }}-${{ github.ref }}.zip
+          asset_path: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
+          asset_name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
           asset_content_type: application/zip
       - name: Rollback Release
         if: failure() && needs.create_release.outputs.id != ''
