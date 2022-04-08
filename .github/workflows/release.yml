@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  create_release:
+  publish_release:
     name: Create Release
     runs-on: ubuntu-latest
     outputs:
@@ -22,11 +22,6 @@ jobs:
           release_name: ${{ github.ref }}
           draft: false
           prerelease: false
-
-  publish_zip:
-    name: Publish Zip
-    runs-on: ubuntu-latest
-    steps:
       - name: Set output
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
