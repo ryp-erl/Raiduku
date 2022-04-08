@@ -1,7 +1,7 @@
 ## Author: Ryp <En Roue Libre>
 ## Interface: 20504
-## Notes: Raiduku
-## Title: Raiduku
+## Notes: Minimalist addon to help raid leaders managing loots and prios in BCC. 
+## Title: Raiduku |cFF00FF00[BCC]|r |cFF0099FFv1.0.0-rc.1+bcc|r
 ## Version: 1.0.0-rc.1+bcc
 ## SavedVariables: RaidukuLootDB
 ## OptionalDeps: Ace3
