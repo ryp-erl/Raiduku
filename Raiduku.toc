@@ -1,0 +1,20 @@
+## Author: Ryp <En Roue Libre>
+## Interface: 20504
+## Notes: Raiduku
+## Title: Raiduku
+## Version: 1.0.0-rc.1+bcc
+## SavedVariables: RaidukuLootDB
+## OptionalDeps: Ace3
+## X-Embed: Ace3
+
+# Embedded libraries
+embeds.xml
+
+# Locale Translations
+Locales\Locales.xml
+
+# Addon files
+Raiduku_Core.lua
+Raiduku_Parse.lua
+Raiduku_Interface.lua
+Raiduku_Loot.lua
