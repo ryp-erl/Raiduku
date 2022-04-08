@@ -42,13 +42,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
           asset_name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
           asset_content_type: application/zip
       - name: Rollback Release
-        if: failure() && needs.create_release.outputs.id != ''
+        if: failure() && steps.create_release.outputs.id != ''
         uses: author/action-rollback@stable
         with:
-          id: ${{ needs.create_release.id }}
+          id: ${{ steps.create_release.id }}
           tag: ${{ github.ref }}
