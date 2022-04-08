@@ -67,18 +67,6 @@ function Raiduku:OnInitialize()
 
     Raiduku.recycler = UnitName("player")
 
-    -- FORCE RESET
-    -- Raiduku.db.profile = {
-    --     loot = {},
-    --     prios = {},
-    --     softres = {},
-    --     lastImport = {},
-    --     lastRecycler = nil,
-    --     autoAward = true,
-    --     recyclerReminder = false,
-    --     interface = {}
-    -- }
-
     if Raiduku.db.profile.lastRecycler ~= nil then
         local raiders = Raiduku:GetRaiders()
         for index, name in ipairs(raiders) do
