@@ -30,7 +30,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Zip
-        run: zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip .
+        run: |
+          rm -rf .git .github README.md
+          zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip .
       - name: Upload Zip
         id: upload_zip
         uses: actions/upload-release-asset@v1
