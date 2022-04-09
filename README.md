@@ -1,5 +1,9 @@
 <img src="https://github.com/ryp-erl/assets/blob/main/Raiduku/rdk_logo.jpg?raw=true" width=50 align="right" />
 
+![version](https://img.shields.io/github/v/release/En-Roue-Libre/Raiduku)
+[![wiki](https://img.shields.io/badge/read-wiki-green)](https://github.com/En-Roue-Libre/Raiduku/wiki)
+[![issues](https://img.shields.io/badge/report-issues-important)](https://github.com/En-Roue-Libre/Raiduku/issues)
+
 # Raiduku
 
 Minimalist World of Warcraft addon to help raid leaders managing loots and prios in Burning Crusade Classic.
