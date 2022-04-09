@@ -1,6 +1,10 @@
+<img src="https://github.com/ryp-erl/assets/blob/main/Raiduku/rdk_logo.jpg?raw=true" width=50 style="float: right;" />
+
 # Raiduku
 
 Minimalist World of Warcraft addon to help raid leaders managing loots and prios in Burning Crusade Classic.
+
+
 
 ## Why this addon?
 
