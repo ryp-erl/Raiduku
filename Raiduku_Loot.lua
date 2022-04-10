@@ -77,6 +77,8 @@ local function updateIcon(itemId)
 end
 
 local function displaySoftResInfo()
+    
+    SendChatMessage("{rt2} SoftRes {rt2}", Raiduku:GetChatType(), nil, nil)
     local raiders = {}
     for i = 1, GetNumGroupMembers() do
         local raiderName = GetRaidRosterInfo(i)
@@ -84,6 +86,7 @@ local function displaySoftResInfo()
     end
     for _, player in ipairs(Raiduku.SoftResList) do
         if raiders[player.name] then
+            SendChatMessage(player.name, Raiduku:GetChatType(), nil, nil)
             Raiduku:AddOrUpdatePlayer(player.name, player.class, 1)
         end
     end
