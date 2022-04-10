@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+env:
+  CF_PROJECT_ID: 607232
+
 jobs:
   publish_release:
     name: Create Release
@@ -49,3 +52,12 @@ jobs:
         with:
           id: ${{ steps.create_release.id }}
           tag: ${{ github.ref }}
+      - name: "Upload to CurseForge"
+        if: steps.upload_zip.outcome == 'success'
+        uses: itsmeow/curseforge-upload@v3
+        with:
+          file_path: "${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip"
+          game_endpoint: "wow"
+          game_versions: "WoW Burning Crusade Classic:2.5.4"
+          project_id: "$CF_PROJECT_ID"
+          token: "${{ secrets.CF_API_TOKEN }}"
