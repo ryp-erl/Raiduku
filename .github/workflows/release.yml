@@ -32,8 +32,9 @@ jobs:
       - name: Zip
         run: |
           rm -rf .git .github README.md
-          mkdir Raiduku
-          mv * Raiduku
+          mkdir RDK
+          ls | grep -v RDK | xargs mv -t RDK
+          mv RDK Raiduku
           zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip Raiduku
       - name: Upload Zip
         id: upload_zip
