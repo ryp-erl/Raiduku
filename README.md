@@ -2,7 +2,8 @@
 
 ![version](https://img.shields.io/github/v/release/En-Roue-Libre/Raiduku)
 [![wiki](https://img.shields.io/badge/read-wiki-green)](https://github.com/En-Roue-Libre/Raiduku/wiki)
-[![issues](https://img.shields.io/badge/report-issues-important)](https://github.com/En-Roue-Libre/Raiduku/issues)
+[![issues](https://img.shields.io/badge/report-issues-blueviolet)](https://github.com/En-Roue-Libre/Raiduku/issues)
+[![curseforge](https://img.shields.io/badge/visit%20on-curseforge-orange)](https://www.curseforge.com/wow/addons/raiduku/)
 
 # Raiduku
 
