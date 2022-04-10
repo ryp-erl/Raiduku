@@ -32,7 +32,9 @@ jobs:
       - name: Zip
         run: |
           rm -rf .git .github README.md
-          zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip .
+          mkdir Raiduku
+          mv !(Raiduku) Raiduku
+          zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip Raiduku
       - name: Upload Zip
         id: upload_zip
         uses: actions/upload-release-asset@v1
@@ -43,13 +45,8 @@ jobs:
           asset_path: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
           asset_name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
           asset_content_type: application/zip
-      - name: Rollback Release
-        if: failure() && steps.create_release.outputs.id != ''
-        uses: author/action-rollback@stable
-        with:
-          id: ${{ steps.create_release.id }}
-          tag: ${{ github.ref }}
       - name: "Upload to CurseForge"
+        id: upload_to_cf
         if: steps.upload_zip.outcome == 'success'
         uses: itsmeow/curseforge-upload@v3
         with:
@@ -58,3 +55,9 @@ jobs:
           game_versions: "WoW Burning Crusade Classic:2.5.4"
           project_id: 607232
           token: "${{ secrets.CF_API_TOKEN }}"
+      - name: Rollback Release
+        if: steps.upload_zip.outcome == 'failure' || steps.upload_to_cf.outcome == 'failure'
+        uses: author/action-rollback@stable
+        with:
+          id: ${{ steps.create_release.id }}
+          tag: ${{ github.ref }}
