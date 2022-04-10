@@ -57,6 +57,7 @@ L["remove-all"] = "Tout supprimer"
 L["delete-selected-dates"] = "Supprimer les dates selectionnées"
 L["x-dates-selected"] = "%s date(s) selectionnée(s)"
 L["activate-soft-prio"] = "Active un mode soft-prio (utilise les prios de TMB comme du softres)"
+L["reverse-roll-order"] = "Inverse l'ordre du rand (1 est le plus fort)"
 
 -- Buttons
 L["now"] = "Maintenant"

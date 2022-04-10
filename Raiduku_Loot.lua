@@ -495,15 +495,22 @@ end
 function Raiduku:GetWinner()
     local winner = nil
     local highestPlusPlayers, highestPlus = self:GetHighestPlusPlayers()
-    local highestRoll = 0
+    local highestRoll = Raiduku.db.profile.reverseRollOrder and 100 or 0
     if #highestPlusPlayers == 1 then
         return highestPlusPlayers[1]
     end
     for _, player in ipairs(self.Players) do
         if player.plus == highestPlus then
-            if player.roll and highestRoll < player.roll then
-                highestRoll = player.roll
-                winner = player
+            if Raiduku.db.profile.reverseRollOrder then
+                if player.roll and highestRoll > player.roll then
+                    highestRoll = player.roll
+                    winner = player
+                end
+            else
+                if player.roll and highestRoll < player.roll then
+                    highestRoll = player.roll
+                    winner = player
+                end
             end
         end
     end
@@ -569,6 +576,12 @@ function Raiduku:UpdatePlusRollResults()
         local rightRoll = tonumber(right.roll) or 0
         local leftPlus = tonumber(left.plus) or 0
         local rightPlus = tonumber(right.plus) or 0
+        if Raiduku.db.profile.reverseRollOrder then
+            if leftPlus == rightPlus then
+                return leftRoll < rightRoll
+            end
+            return leftPlus > rightPlus
+        end
         if leftPlus == rightPlus then
             return leftRoll > rightRoll
         end

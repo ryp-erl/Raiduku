@@ -20,6 +20,7 @@ Raiduku.defaults = {
         autoAwardCommon = true,
         autoAwardRare = true,
         recyclerReminder = false,
+        reverseRollOrder = false,
         enableSoftPrios = false,
         interface = {}
     }
