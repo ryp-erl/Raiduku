@@ -33,7 +33,7 @@ jobs:
         run: |
           rm -rf .git .github README.md
           mkdir Raiduku
-          mv !(Raiduku) Raiduku
+          mv * Raiduku
           zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip Raiduku
       - name: Upload Zip
         id: upload_zip
