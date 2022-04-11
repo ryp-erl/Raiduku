@@ -128,12 +128,16 @@ local function lootLinkedHandler(...)
                     raiders[raiderName] = true
                 end
                 if Raiduku.db.profile.enableSoftPrio then
+                    SendChatMessage("{rt2} Soft Prios {rt2}", Raiduku:GetChatType(), nil, nil)
+                    local prioNames = {}
                     for _, prio in ipairs(prios[itemId]) do
                         if prio.name and raiders[prio.name] then
+                            tinsert(prioNames, prio.name)
                             Raiduku:AddOrUpdatePlayer(prio.name, prio.class, 1)
                             Raiduku:UpdatePlusRollResults()
                         end
                     end
+                    SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
                     Raiduku.LootWindow.removeLastPlayerButton:Show()
                 else
                     for _, prio in ipairs(prios[itemId]) do
@@ -216,7 +220,7 @@ local function playerPlusHandler(...)
         local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
-        if Raiduku.Loots[1] and plus and #text == 2 and #Raiduku.SoftResList == 0 then
+        if Raiduku.Loots[1] and plus and #text == 2 and #Raiduku.SoftResList == 0 and not Raiduku.db.profile.enableSoftPrio then
             Raiduku:AddOrUpdatePlayer(name, class, plus)
         end
         Raiduku:UpdatePlusRollResults()
@@ -270,8 +274,8 @@ end)
 Raiduku.LootWindow.laterButton:SetScript("OnClick", function()
     SendChatMessage(Raiduku.L["loot-later"], Raiduku:GetWarningChatType(), nil, nil)
     while Raiduku.Loots[1] do
-        Raiduku:Award(Raiduku.Loots[1].index, Raiduku.recycler)
         SendChatMessage("{rt1} " .. Raiduku.Loots[1].link, Raiduku:GetChatType(), nil, nil)
+        Raiduku:Award(Raiduku.Loots[1].index, UnitName("player"))
     end
     Raiduku.Loots = {}
     Raiduku.LootWindow:Hide()
@@ -349,6 +353,12 @@ end)
 
 Raiduku.LootWindow.removeLastPlayerButton:SetScript("OnClick", function(self)
     Raiduku.Players[#Raiduku.Players] = nil
+    local prioNames = {}
+    SendChatMessage("{rt2} Soft Prios (update) {rt2}", Raiduku:GetChatType(), nil, nil)
+    for _, player in ipairs(Raiduku.Players) do
+        tinsert(prioNames, player.name)
+    end
+    SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
     Raiduku:UpdatePlusRollResults()
 end)
 
