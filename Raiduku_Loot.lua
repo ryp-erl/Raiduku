@@ -137,8 +137,10 @@ local function lootLinkedHandler(...)
                             Raiduku:UpdatePlusRollResults()
                         end
                     end
-                    SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
-                    Raiduku.LootWindow.removeLastPlayerButton:Show()
+                    if #prioNames > 0 then
+                        SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
+                        Raiduku.LootWindow.removeLastPlayerButton:Show()
+                    end
                 else
                     for _, prio in ipairs(prios[itemId]) do
                         if prio.name and raiders[prio.name] then
@@ -220,7 +222,7 @@ local function playerPlusHandler(...)
         local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
-        if Raiduku.Loots[1] and plus and #text == 2 and #Raiduku.SoftResList == 0 and not Raiduku.db.profile.enableSoftPrio then
+        if Raiduku.Loots[1] and plus and #text == 2 and #Raiduku.SoftResList == 0 then
             Raiduku:AddOrUpdatePlayer(name, class, plus)
         end
         Raiduku:UpdatePlusRollResults()
