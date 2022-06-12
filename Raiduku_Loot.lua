@@ -28,6 +28,22 @@ Raiduku.LootItemIgnoreList = {
     [30317] = true
 }
 
+Raiduku.LootItemResources = {
+    -- Phase 3 Epic Gems
+    [32227] = true,
+    [32231] = true,
+    [32229] = true,
+    [32230] = true,
+    [32249] = true,
+    [32228] = true,
+    -- Mark of the Illidari
+    [32897] = true,
+    -- Heart of Darkness
+    [32428] = true,
+    -- Sunmote
+    [34664] = true
+}
+
 --[[
     Local functions
 --]]
@@ -179,7 +195,7 @@ local function chatMsgLootHandler(...)
     local itemId = loot:match("|Hitem:(%d+):")
     if itemId then
         local _, itemLink, itemQuality, _, _, itemType = GetItemInfo(itemId)
-        if itemQuality >= 3 and (Raiduku.LootItemTypes[itemType] or Raiduku.LootItemSpecials[itemId]) and
+        if itemQuality >= 3 and (Raiduku.LootItemTypes[itemType] or Raiduku.LootItemSpecials[tonumber(itemId)]) and
             Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
             local alreadySaved = false
             for _, loots in next, Raiduku.db.profile.loot do
@@ -235,6 +251,10 @@ local function lootOpenedHandler()
             local itemLink = GetLootSlotLink(i)
             if itemLink then
                 local itemRarity = select(3, GetItemInfo(itemLink))
+                local itemId = itemLink:match("|Hitem:(%d+):")
+                if Raiduku.LootItemResources[tonumber(itemId)] then
+                    Raiduku:Award(i, UnitName("player"))
+                end
                 if itemRarity >= 3 then
                     tinsert(Raiduku.Loots, {
                         link = itemLink,
