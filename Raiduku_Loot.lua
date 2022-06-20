@@ -252,14 +252,16 @@ local function lootOpenedHandler()
             if itemLink then
                 local itemRarity = select(3, GetItemInfo(itemLink))
                 local itemId = itemLink:match("|Hitem:(%d+):")
-                if Raiduku.LootItemResources[tonumber(itemId)] then
-                    Raiduku:Award(i, UnitName("player"))
-                end
-                if itemRarity >= 3 then
+                if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil
+                 and Raiduku.LootItemResources[tonumber(itemId)] == nil then
                     tinsert(Raiduku.Loots, {
                         link = itemLink,
                         index = i
                     })
+                end
+                if Raiduku.LootItemResources[tonumber(itemId)] then
+                    Raiduku:Print(Raiduku.L["auto-awarding"] .. " " .. itemLink)
+                    Raiduku:AutoAwardToSelf(i)
                 end
                 if itemRarity == 2 and Raiduku.db.profile.autoAwardCommon then
                     Raiduku:Print(Raiduku.L["auto-awarding"] .. " " .. itemLink)
@@ -429,6 +431,21 @@ function Raiduku:AutoAwardToRecycler(lootIndex)
     for raiderId = 1, GetNumGroupMembers() do
         local raider = GetMasterLootCandidate(lootIndex, raiderId)
         if raider and raider == Raiduku.recycler then
+            GiveMasterLoot(lootIndex, raiderId);
+            playerNotFound = false
+        end
+    end
+    if playerNotFound then
+        self:Print(self.L["cannot-award-to"]:format(Raiduku.recycler))
+        StaticPopup_Show("RDK_CONFIRM_RECYCLER", Raiduku.recycler)
+    end
+end
+
+function Raiduku:AutoAwardToSelf(lootIndex)
+    local playerNotFound = true
+    for raiderId = 1, GetNumGroupMembers() do
+        local raider = GetMasterLootCandidate(lootIndex, raiderId)
+        if raider and raider == UnitName("player") then
             GiveMasterLoot(lootIndex, raiderId);
             playerNotFound = false
         end
