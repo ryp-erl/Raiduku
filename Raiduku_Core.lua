@@ -3,7 +3,7 @@ Raiduku.L = Raiduku.L or LibStub("AceLocale-3.0"):GetLocale("Raiduku")
 Raiduku.AceGUI = Raiduku.AceGUI or LibStub("AceGUI-3.0")
 
 Raiduku.name = "Raiduku"
-Raiduku.version = "1.0.0-rc.1+bcc"
+Raiduku.version = "1.1.4+bcc"
 
 --[[
     Initializing the addon using Ace3.
