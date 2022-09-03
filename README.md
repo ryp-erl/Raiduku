@@ -7,7 +7,7 @@
 
 # Raiduku
 
-Minimalist World of Warcraft addon to help raid leaders managing loots in Burning Crusade Classic.
+Minimalist World of Warcraft addon to help raid leaders managing loots in Wrath of Lich King Classic.
 
 ## Why this addon?
 
