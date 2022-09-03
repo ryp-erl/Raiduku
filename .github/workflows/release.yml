@@ -53,7 +53,7 @@ jobs:
         with:
           file_path: "${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip"
           game_endpoint: "wow"
-          game_versions: "WoW Burning Crusade Classic:2.5.4"
+          game_versions: "WoW Wrath of the Lich King Classic:3.4.0"
           project_id: 607232
           token: "${{ secrets.CF_API_TOKEN }}"
       - name: Rollback Release
