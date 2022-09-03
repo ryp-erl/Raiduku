@@ -2,7 +2,7 @@
 ## Interface: 30400
 ## Notes: Minimalist addon to help raid leaders managing loots and prios in BCC. 
 ## Title: Raiduku |cFF00FF00[BCC]|r |cFF0099FFv1.1.0+bcc|r
-## Version: 1.1.0+wotlkc
+## Version: 1.1.4+wotlkc
 ## SavedVariables: RaidukuLootDB
 ## OptionalDeps: Ace3
 ## X-Embed: Ace3
