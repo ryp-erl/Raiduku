@@ -21,6 +21,10 @@ Minimalist World of Warcraft addon to help raid leaders managing loots in Wrath 
 
 Checkout the [Wiki](https://github.com/En-Roue-Libre/Raiduku/wiki) for more information on how to use this addon.
 
+## Other addons:
+
+- [AutoLoggerWotlk](https://www.curseforge.com/wow/addons/autologgerwotlk): Automatically start combat logging when entering a Wotlk raid.
+
 ## License
 
 [GNU GPLv3](LICENSE)
