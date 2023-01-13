@@ -31,10 +31,10 @@ function Raiduku:DrawLootWindow()
     RaidukuFrameUI.image = CreateFrame("Button", nil, RaidukuFrameUI)
     RaidukuFrameUI.image:SetWidth(32)
     RaidukuFrameUI.image:SetHeight(32)
-    RaidukuFrameUI.image:SetPoint("TOPLEFT", 15, -15)
+    RaidukuFrameUI.image:SetPoint("TOPLEFT", 10, -10)
 
-    RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormalLarge")
-    RaidukuFrameUI.title:SetPoint("TOPLEFT", 50, -23)
+    RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
+    RaidukuFrameUI.title:SetPoint("TOPLEFT", 50, -20)
 
     local nowLaterBtnWidth = math.max(#Raiduku.L["now"], #Raiduku.L["later"]) * 10
 
