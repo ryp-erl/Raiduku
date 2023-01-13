@@ -12,7 +12,7 @@ L["cmd-softres-desc"] = "Importe les réservations de butin au format CSV depuis
 
 -- Infos
 L["export-data-reminder"] =
-    "Tu peux exporter les attributions de butin pour |cff1eff00thatsmybis.com|r en utilisant |cffffe600/rdk export|r"
+"Tu peux exporter les attributions de butin pour |cff1eff00thatsmybis.com|r en utilisant |cffffe600/rdk export|r"
 L["saved-for-tmb"] = "Enregistré pour |cff1eff00thatsmybis.com|r que %s a reçu %s pour sa %s"
 L["waiting-for-roll"] = "|cffffffffen attente...|r"
 L["loot-method-is"] = "Le mode de butin est |cff00ddff%s|r"
@@ -24,15 +24,15 @@ L["change-recycler"] = "Le responsable du recyclage est |cffff8000%s|r. Est-ce q
 L["to-change-recycler-run"] = "Pour changer de responsable du recyclage, lance |cffffe600/rdk config|r"
 L["cannot-award-to"] = "|cffff0000Impossible d'attribuer le butin à |r %s"
 L["confirm-manual-award-save-for-tmb"] =
-    "%s a été attribué manuellement à |cffff8000%s|r.\nEst-ce que tu veux quand même sauvegarder l'information pour |cff1eff00thatsmybis.com|r ?"
+"%s a été attribué manuellement à |cffff8000%s|r.\nEst-ce que tu veux quand même sauvegarder l'information pour |cff1eff00thatsmybis.com|r ?"
 L["prios-saved"] = "priorités |cff33ff00enregistrées|r"
 L["softres-saved"] = "réservations |cff33ff00enregistrées|r"
 L["prios-found"] = "priorités |cff33ff00trouvées|r"
 L["softres-found"] = "réservations |cff33ff00trouvées|r"
 L["prios-invalid-import"] =
-    "|cffff0000Import erroné|r: la première ligne n'est pas un en-tête valide ou supporté de |cff1eff00thatsmybis.com|r"
+"|cffff0000Import erroné|r: la première ligne n'est pas un en-tête valide ou supporté de |cff1eff00thatsmybis.com|r"
 L["softres-invalid-import"] =
-    "|cffff0000Import erroné|r: la première ligne n'est pas un en-tête valide ou supporté de |cff1eff00softres.it|r"
+"|cffff0000Import erroné|r: la première ligne n'est pas un en-tête valide ou supporté de |cff1eff00softres.it|r"
 L["loot-later"] = "{rt6} Attribution du butin plus tard {rt6}"
 L["x-come-trade-on-me"] = "%s ==> ÉCHANGE avec moi"
 L["removed-x-from-prios-for-x"] = "%s a été retiré des prios importées pour %s"
@@ -49,7 +49,7 @@ L["copy-following-data"] = "Copie les données suivantes:"
 L["managing-loots"] = "Gestion du butin"
 L["open-recycler-popup-reminder"] = "Ouvrir une alerte pour mettre à jour le responsable du recyclage"
 L["choose-dates"] = "Choisis une ou plusieurs dates:"
-L["choose-recycler"] = "Choisis un responsable pour recycler le butin:"
+L["choose-recycler"] = "Choisis un responsable pour recycler le butin (non-LQE) :"
 L["auto-award-common"] = "Auto-attribuer le butin |cff1eff00Commun|r"
 L["auto-award-rare"] = "Auto-attribuer le butin |cff0070ddRare|r"
 L["import-and-override"] = "Importe et écrase"

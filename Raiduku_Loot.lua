@@ -117,7 +117,6 @@ local function updateIcon(itemId)
 end
 
 local function displaySoftResInfo()
-
     SendChatMessage("{rt2} SoftRes {rt2}", Raiduku:GetChatType(), nil, nil)
     local raiders = {}
     for i = 1, GetNumGroupMembers() do
@@ -140,6 +139,7 @@ local function lootLinkedHandler(...)
     name = strsplit("-", name)
     if name == playerName and itemId and not (text:find("GG") or text:find("{rt1}")) then
         local _, itemLink, itemRarity = GetItemInfo(itemId)
+        local itemBindType = select(14, GetItemInfo(itemId))
         if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
             local prios = Raiduku.db.profile.prios
             itemId = tonumber(itemId)
@@ -150,7 +150,11 @@ local function lootLinkedHandler(...)
             Raiduku.Players = {}
             Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
             updateIcon(itemId)
-            Raiduku.LootWindow.title:SetText(itemLink)
+            if itemBindType == Raiduku.ItemBindType.BIND_WHEN_EQUIPPED then
+                Raiduku.LootWindow.title:SetText("(BoE) " .. itemLink)
+            else
+                Raiduku.LootWindow.title:SetText(itemLink)
+            end
             Raiduku.LootWindow.startButton:Hide()
             Raiduku.LootWindow.laterButton:Hide()
             Raiduku.LootWindow.rollsButton:Disable()
@@ -340,8 +344,13 @@ Raiduku.LootWindow.laterButton:SetScript("OnClick", function()
 end)
 
 Raiduku.LootWindow.recycleButton:SetScript("OnClick", function()
+    local itemBindType = select(14, GetItemInfo(Raiduku.Loots[1].link))
     if Raiduku.Loots[1] then
-        Raiduku:Award(Raiduku.Loots[1].index, Raiduku.recycler)
+        if itemBindType == Raiduku.ItemBindType.BIND_WHEN_EQUIPPED then
+            Raiduku:Award(Raiduku.Loots[1].index, UnitName("player"))
+        else
+            Raiduku:Award(Raiduku.Loots[1].index, Raiduku.recycler)
+        end
     end
     if #Raiduku.Loots > 0 then
         Raiduku.Players = {}
