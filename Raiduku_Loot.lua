@@ -27,7 +27,9 @@ Raiduku.LootItemIgnoreList = {
     [30317] = true
 }
 Raiduku.LootItemResources = {
-    -- Phase 3 Epic Gems
+    -- LK Phase 2 Runed Orb
+    [45087] = true,
+    -- BC Phase 3 Epic Gems
     [32227] = true,
     [32231] = true,
     [32229] = true,
@@ -95,7 +97,6 @@ end
 local function startNextLoot()
     C_Timer.NewTimer(0.2, function()
         if (#Raiduku.Loots > 0) then
-            -- Raiduku.LootWindow.content:Show()
             SendChatMessage(Raiduku.Loots[1].link, Raiduku:GetWarningChatType(), nil, nil)
         end
     end)
