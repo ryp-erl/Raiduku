@@ -1,9 +1,17 @@
 Raiduku = Raiduku or LibStub("AceAddon-3.0"):NewAddon("Raiduku", "AceConsole-3.0", "AceEvent-3.0")
 Raiduku.L = Raiduku.L or LibStub("AceLocale-3.0"):GetLocale("Raiduku")
 Raiduku.AceGUI = Raiduku.AceGUI or LibStub("AceGUI-3.0")
+Raiduku.ST = Raiduku.ST or LibStub("ScrollingTable");
 
 Raiduku.name = "Raiduku"
 Raiduku.version = "1.1.4+wotlkc"
+
+Raiduku.Constants = Raiduku.Constants or {
+    ["LOOT_MODE_ROLL"] = 1,
+    ["LOOT_MODE_PRIO"] = 2,
+    ["LOOT_MODE_SOFTPRIO"] = 3,
+    ["LOOT_MODE_SOFTRES"] = 4,
+}
 
 --[[
     Initializing the addon using Ace3.
@@ -120,7 +128,7 @@ function Raiduku:ImportPrios()
     if self.db.profile.lastImport.prios then
         local status = self.name .. " - " .. self.version
         status = status .. " :: |cffffffff" .. self.db.profile.lastImport.prios .. "|r :: |cff33ff00" ..
-                     Raiduku:GetNumPrios() .. " prios|r"
+            Raiduku:GetNumPrios() .. " prios|r"
         frame:SetStatusText(status)
         if Raiduku:GetNumPrios() == 0 then
             removeAllButton:SetDisabled(true)
@@ -137,7 +145,7 @@ function Raiduku:ImportPrios()
             self.db.profile.lastImport.prios = self:GetCurrentDateTime()
             local status = self.name .. " - " .. self.version
             status = status .. " :: |cffffffff" .. self.db.profile.lastImport.prios .. "|r :: |cff33ff00" ..
-                         Raiduku:GetNumPrios() .. " prios|r"
+                Raiduku:GetNumPrios() .. " prios|r"
             frame:SetStatusText(status)
             if Raiduku:GetNumPrios() == 0 then
                 removeAllButton:SetDisabled(true)
@@ -153,7 +161,7 @@ function Raiduku:ImportPrios()
         importBox.pasted = nil
         local status = self.name .. " - " .. self.version
         status = status .. " :: |cffffffff" .. self.db.profile.lastImport.prios .. "|r :: |cff33ff00" ..
-                     Raiduku:GetNumPrios() .. " prios|r"
+            Raiduku:GetNumPrios() .. " prios|r"
         frame:SetStatusText(status)
         removeAllButton:SetDisabled(true)
     end)
@@ -166,7 +174,7 @@ function Raiduku:ImportSoftRes()
     if self.db.profile.lastImport.softres then
         local status = self.name .. " - " .. self.version
         status = status .. " :: |cffffffff" .. self.db.profile.lastImport.softres .. "|r :: |cff33ff00" ..
-                     Raiduku:GetNumSoftRes() .. " softres|r"
+            Raiduku:GetNumSoftRes() .. " softres|r"
         frame:SetStatusText(status)
         if Raiduku:GetNumSoftRes() == 0 then
             removeAllButton:SetDisabled(true)
@@ -183,7 +191,7 @@ function Raiduku:ImportSoftRes()
             self.db.profile.lastImport.softres = self:GetCurrentDateTime()
             local status = self.name .. " - " .. self.version
             status = status .. " :: |cffffffff" .. self.db.profile.lastImport.softres .. "|r :: |cff33ff00" ..
-                         Raiduku:GetNumSoftRes() .. " softres|r"
+                Raiduku:GetNumSoftRes() .. " softres|r"
             frame:SetStatusText(status)
             if Raiduku:GetNumSoftRes() == 0 then
                 removeAllButton:SetDisabled(true)
@@ -199,7 +207,7 @@ function Raiduku:ImportSoftRes()
         importBox.pasted = nil
         local status = self.name .. " - " .. self.version
         status = status .. " :: |cffffffff" .. self.db.profile.lastImport.softres .. "|r :: |cff33ff00" ..
-                     Raiduku:GetNumSoftRes() .. " softres|r"
+            Raiduku:GetNumSoftRes() .. " softres|r"
         frame:SetStatusText(status)
         removeAllButton:SetDisabled(true)
     end)

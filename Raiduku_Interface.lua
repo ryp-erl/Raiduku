@@ -1,18 +1,15 @@
 Raiduku.db = Raiduku.db or LibStub("AceDB-3.0"):New("RaidukuLootDB", Raiduku.defaults, true)
 
 function Raiduku:DrawLootWindow()
-    local defaultPoint = unpack(Raiduku.db.profile.interface.RaidukuLootWindow or {"CENTER", 0, 0})
+    local defaultPoint = unpack(Raiduku.db.profile.interface.RaidukuLootWindow or { "CENTER", 0, 0 })
     local RaidukuFrameUI = CreateFrame("Frame", "RaidukuLootWindow", UIParent)
     RaidukuFrameUI:SetPoint(defaultPoint)
-    RaidukuFrameUI:SetSize(320, 360)
+    RaidukuFrameUI:SetSize(340, 380)
     RaidukuFrameUI:SetMovable(true)
-    RaidukuFrameUI:SetResizable(true)
     RaidukuFrameUI:EnableMouse(true)
     RaidukuFrameUI:RegisterForDrag("LeftButton")
     RaidukuFrameUI:Hide()
 
-    RaidukuFrameUI:SetMinResize(220, 220)
-    RaidukuFrameUI:SetMaxResize(800, 800)
     RaidukuFrameUI:SetScript("OnDragStart", function(self)
         self:StartMoving()
     end)
@@ -27,20 +24,6 @@ function Raiduku:DrawLootWindow()
         Raiduku.db.profile.interface[self:GetName()].offsetY = offsetY
     end)
 
-    RaidukuFrameUI.resizeButton = CreateFrame("Button", nil, RaidukuFrameUI)
-    RaidukuFrameUI.resizeButton:EnableMouse(true)
-    RaidukuFrameUI.resizeButton:SetPoint("BOTTOMRIGHT")
-    RaidukuFrameUI.resizeButton:SetSize(16, 16)
-    RaidukuFrameUI.resizeButton:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-    RaidukuFrameUI.resizeButton:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-    RaidukuFrameUI.resizeButton:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-    RaidukuFrameUI.resizeButton:SetScript("OnMouseDown", function(self)
-        RaidukuFrameUI:StartSizing("BOTTOMRIGHT")
-    end)
-    RaidukuFrameUI.resizeButton:SetScript("OnMouseUp", function()
-        RaidukuFrameUI:StopMovingOrSizing()
-    end)
-
     RaidukuFrameUI.texture = RaidukuFrameUI:CreateTexture()
     RaidukuFrameUI.texture:SetAllPoints(RaidukuFrameUI)
     RaidukuFrameUI.texture:SetColorTexture(0, 0, 0, 0.7)
@@ -52,11 +35,6 @@ function Raiduku:DrawLootWindow()
 
     RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormalLarge")
     RaidukuFrameUI.title:SetPoint("TOPLEFT", 50, -23)
-    RaidukuFrameUI.content = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
-    RaidukuFrameUI.content:SetPoint("TOPLEFT", 50, -80)
-    RaidukuFrameUI.content:SetJustifyV("BOTTOM");
-    RaidukuFrameUI.content:SetJustifyH("LEFT");
-    RaidukuFrameUI.content:SetWidth(200)
 
     local nowLaterBtnWidth = math.max(#Raiduku.L["now"], #Raiduku.L["later"]) * 10
 
@@ -94,29 +72,6 @@ function Raiduku:DrawLootWindow()
     RaidukuFrameUI.recycleButton:SetText(Raiduku.L["recycle-loot"])
     RaidukuFrameUI.recycleButton:SetPoint("BOTTOM", 0, 20)
     RaidukuFrameUI.recycleButton:Hide()
-
-    RaidukuFrameUI.prioButton = CreateFrame("Button", "PrioButton", RaidukuFrameUI, "UIPanelButtonTemplate")
-    RaidukuFrameUI.prioButton:SetSize(120, 35)
-    RaidukuFrameUI.prioButton:SetText(Raiduku.L["award-prio"])
-    RaidukuFrameUI.prioButton:SetPoint("TOP", 0, -50)
-    RaidukuFrameUI.prioButton:Hide()
-
-    RaidukuFrameUI.removeLastPlayerButton = CreateFrame("Button", "RemoveLastPlayerButton", RaidukuFrameUI,
-        "UIPanelButtonTemplate")
-    RaidukuFrameUI.removeLastPlayerButton:SetSize(150, 35)
-    RaidukuFrameUI.removeLastPlayerButton:SetText(Raiduku.L["remove-last-player"])
-    RaidukuFrameUI.removeLastPlayerButton:SetPoint("TOP", 0, -50)
-    RaidukuFrameUI.removeLastPlayerButton:Hide()
-
-    RaidukuFrameUI.prioList = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
-    RaidukuFrameUI.prioList:SetPoint("TOP", 60, -100)
-    RaidukuFrameUI.prioList:SetJustifyH("LEFT")
-    RaidukuFrameUI.prioList:SetWidth(200)
-
-    RaidukuFrameUI.softresList = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
-    RaidukuFrameUI.softresList:SetPoint("TOP", 60, -100)
-    RaidukuFrameUI.softresList:SetJustifyH("LEFT")
-    RaidukuFrameUI.softresList:SetWidth(200)
 
     return RaidukuFrameUI
 end
@@ -286,7 +241,7 @@ function Raiduku:DrawExportWindow()
 
         if #selectedDates > 0 then
             status = Raiduku.name .. " - " .. Raiduku.version .. " :: |cffffffff" ..
-                         Raiduku.L["x-dates-selected"]:format(#selectedDates) .. "|r"
+                Raiduku.L["x-dates-selected"]:format(#selectedDates) .. "|r"
         end
 
         editbox:SetText(export)
@@ -402,6 +357,7 @@ function Raiduku:DrawImportBox(...)
             infoPastedText:SetText(numItems .. " " .. foundItemsText)
         end
     end
+
     importBox.editBox:SetScript('OnChar', function(self, c)
         if lastPaste ~= GetTime() then
             textBuffer, i, lastPaste = {}, 0, GetTime()

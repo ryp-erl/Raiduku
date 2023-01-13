@@ -1,4 +1,5 @@
 Raiduku.LootWindow = Raiduku:DrawLootWindow()
+Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
 Raiduku.Loots = {}
 Raiduku.Players = {}
 Raiduku.SoftResList = {}
@@ -8,12 +9,10 @@ Raiduku.LootItemTypes = {
     ["Recipe"] = 9,
     ["Miscellaneous"] = 15
 }
-
 Raiduku.LootItemSpecials = {
     [32385] = true,
     [34845] = true
 }
-
 Raiduku.LootItemIgnoreList = {
     -- Badge of Justice
     [29434] = true,
@@ -27,7 +26,6 @@ Raiduku.LootItemIgnoreList = {
     [30311] = true,
     [30317] = true
 }
-
 Raiduku.LootItemResources = {
     -- Phase 3 Epic Gems
     [32227] = true,
@@ -43,6 +41,34 @@ Raiduku.LootItemResources = {
     -- Sunmote
     [34664] = true
 }
+Raiduku.LootSTDataColumns = {
+    {
+        name = "Player",
+        width = 120,
+        align = "LEFT",
+    },
+    {
+        name = "Prio",
+        width = 60,
+        align = "LEFT",
+    },
+    {
+        name = "Need",
+        width = 60,
+        align = "LEFT",
+    },
+    {
+        name = "Roll",
+        width = 30,
+        align = "LEFT",
+    },
+};
+Raiduku.RollLootST = Raiduku.ST:CreateST(Raiduku.LootSTDataColumns, nil, nil, nil, Raiduku.LootWindow);
+Raiduku.RollLootST.frame:SetPoint("TOPLEFT", 19, -80)
+Raiduku.RollLootST:EnableSelection(true)
+Raiduku.RollLootST:SetDefaultHighlight(1.0, 0.9, 0, 0.2)
+Raiduku.RollLootST:ClearSelection()
+Raiduku.RollLootST:Hide()
 
 --[[
     Local functions
@@ -52,26 +78,24 @@ local function resetAll()
     Raiduku.Loots = {}
     Raiduku.Players = {}
     Raiduku.SoftResList = {}
+    Raiduku.RollLootST:ClearSelection()
+    Raiduku.RollLootST:SetData({}, true)
+    Raiduku.RollLootST:Hide()
     Raiduku.LootWindow.title:SetText(nil)
-    Raiduku.LootWindow.content:SetText(nil)
-    Raiduku.LootWindow.content:Show()
     Raiduku.LootWindow.image:SetNormalTexture(nil)
     Raiduku.LootWindow.image:SetPushedTexture(nil)
-    Raiduku.LootWindow.prioList:SetText(nil)
-    Raiduku.LootWindow.softresList:SetText(nil)
     Raiduku.LootWindow.startButton:Show()
     Raiduku.LootWindow.laterButton:Show()
     Raiduku.LootWindow.rollsButton:Hide()
     Raiduku.LootWindow.winnerButton:Hide()
     Raiduku.LootWindow.recycleButton:Hide()
-    Raiduku.LootWindow.prioButton:Hide()
     Raiduku.LootWindow:Hide()
 end
 
 local function startNextLoot()
     C_Timer.NewTimer(0.2, function()
         if (#Raiduku.Loots > 0) then
-            Raiduku.LootWindow.content:Show()
+            -- Raiduku.LootWindow.content:Show()
             SendChatMessage(Raiduku.Loots[1].link, Raiduku:GetWarningChatType(), nil, nil)
         end
     end)
@@ -93,7 +117,7 @@ local function updateIcon(itemId)
 end
 
 local function displaySoftResInfo()
-    
+
     SendChatMessage("{rt2} SoftRes {rt2}", Raiduku:GetChatType(), nil, nil)
     local raiders = {}
     for i = 1, GetNumGroupMembers() do
@@ -124,18 +148,17 @@ local function lootLinkedHandler(...)
                 index = 1
             })
             Raiduku.Players = {}
+            Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
             updateIcon(itemId)
             Raiduku.LootWindow.title:SetText(itemLink)
-            Raiduku.LootWindow.prioList:SetText(nil)
-            Raiduku.LootWindow.softresList:SetText(nil)
             Raiduku.LootWindow.startButton:Hide()
             Raiduku.LootWindow.laterButton:Hide()
-            Raiduku.LootWindow.prioButton:Hide()
             Raiduku.LootWindow.rollsButton:Disable()
             Raiduku.LootWindow.winnerButton:Disable()
             Raiduku.LootWindow.rollsButton:Show()
             Raiduku.LootWindow.winnerButton:Show()
             Raiduku.LootWindow.recycleButton:Show()
+            Raiduku.RollLootST:Show()
             if prios[itemId] then
                 local prioList = {}
                 local raiders = {}
@@ -154,24 +177,28 @@ local function lootLinkedHandler(...)
                         end
                     end
                     if #prioNames > 0 then
+                        Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTPRIO
                         SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
-                        Raiduku.LootWindow.removeLastPlayerButton:Show()
                     end
                 else
+                    local prioTableData = {}
                     for _, prio in ipairs(prios[itemId]) do
                         if prio.name and raiders[prio.name] then
+                            local prioName = prio.order == 1 and "|cFF00FF00" .. prio.name .. "|r" or prio.name
+                            local prioOrder = prio.order == 1 and "|cFF00FF00" .. prio.order .. "|r" or prio.order
                             tinsert(prioList, prio.order .. ": " .. prio.name)
+                            tinsert(prioTableData, { prioName, prioOrder, "+1", nil })
                         end
                     end
                     if #prioList > 0 then
+                        Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_PRIO
+                        Raiduku.RollLootST:SetSelection(1)
+                        Raiduku.RollLootST:SetData(prioTableData, true)
+                        Raiduku.LootWindow.winnerButton:SetEnabled(true)
                         SendChatMessage("{rt2} Prios {rt2}", Raiduku:GetChatType(), nil, nil)
                         for _, prio in ipairs(prioList) do
                             SendChatMessage(prio, Raiduku:GetChatType(), nil, nil)
                         end
-                        prioList[1] = "|cFF00FF00" .. prioList[1] .. "|r\n"
-                        Raiduku.LootWindow.prioList:SetText(table.concat(prioList, "\n"))
-                        Raiduku.LootWindow.prioButton:Show()
-                        Raiduku.LootWindow.content:Hide()
                     else
                         Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
                         if #Raiduku.SoftResList > 0 then
@@ -179,11 +206,11 @@ local function lootLinkedHandler(...)
                         end
                     end
                 end
+            elseif #Raiduku.SoftResList > 0 then
+                Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTRES
+                displaySoftResInfo()
             else
-                Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
-                if #Raiduku.SoftResList > 0 then
-                    displaySoftResInfo()
-                end
+                Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
             end
             Raiduku.LootWindow:Show()
         end
@@ -227,18 +254,21 @@ local function playerRollHandler(...)
                 player.roll = roll
             end
         end
-        Raiduku:UpdatePlusRollResults()
+        if Raiduku.LootMode ~= Raiduku.Constants.LOOT_MODE_PRIO then
+            Raiduku:UpdatePlusRollResults()
+        end
     end
 end
 
 local function playerPlusHandler(...)
-    if Raiduku.LootWindow.prioList:GetText() == nil or #Raiduku.LootWindow.prioList:GetText() == 0 then
+    if Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_ROLL or
+        Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_SOFTPRIO then
         local text, player = ...
         local guid = select(12, ...)
         local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
-        if Raiduku.Loots[1] and plus and #text == 2 and #Raiduku.SoftResList == 0 then
+        if Raiduku.Loots[1] and plus and #text == 2 then
             Raiduku:AddOrUpdatePlayer(name, class, plus)
         end
         Raiduku:UpdatePlusRollResults()
@@ -253,7 +283,7 @@ local function lootOpenedHandler()
                 local itemRarity = select(3, GetItemInfo(itemLink))
                 local itemId = itemLink:match("|Hitem:(%d+):")
                 if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil
-                 and Raiduku.LootItemResources[tonumber(itemId)] == nil then
+                    and Raiduku.LootItemResources[tonumber(itemId)] == nil then
                     tinsert(Raiduku.Loots, {
                         link = itemLink,
                         index = i
@@ -291,6 +321,7 @@ Raiduku.LootWindow.startButton:SetScript("OnClick", function(self)
     self:Hide()
     Raiduku.LootWindow.laterButton:Hide()
     if #Raiduku.Loots > 0 then
+        Raiduku.RollLootST:Show()
         startNextLoot()
     end
 end)
@@ -302,6 +333,9 @@ Raiduku.LootWindow.laterButton:SetScript("OnClick", function()
         Raiduku:Award(Raiduku.Loots[1].index, UnitName("player"))
     end
     Raiduku.Loots = {}
+    Raiduku.RollLootST:ClearSelection()
+    Raiduku.RollLootST:SetData({}, true)
+    Raiduku.RollLootST:Hide()
     Raiduku.LootWindow:Hide()
 end)
 
@@ -311,6 +345,8 @@ Raiduku.LootWindow.recycleButton:SetScript("OnClick", function()
     end
     if #Raiduku.Loots > 0 then
         Raiduku.Players = {}
+        Raiduku.RollLootST:ClearSelection()
+        Raiduku.RollLootST:SetData({}, true)
         startNextLoot()
     else
         resetAll()
@@ -324,7 +360,13 @@ Raiduku.LootWindow.rollsButton:SetScript("OnClick", function()
 end)
 
 Raiduku.LootWindow.winnerButton:SetScript("OnClick", function()
-    local winner = Raiduku:GetWinner()
+    local selectedPlayer = Raiduku.RollLootST:GetRow(Raiduku.RollLootST:GetSelection())
+    local winner = {
+        ["name"] = selectedPlayer[1],
+        ["prio"] = selectedPlayer[2],
+        ["plus"] = tonumber(string.match(selectedPlayer[3], "+(%d)")),
+        ["roll"] = selectedPlayer[4]
+    };
     local message = "{rt1} GG "
 
     message = message .. winner.name .. " [+" .. winner.plus .. "]"
@@ -347,43 +389,6 @@ Raiduku.LootWindow.winnerButton:SetScript("OnClick", function()
     else
         resetAll()
     end
-end)
-
-Raiduku.LootWindow.prioButton:SetScript("OnClick", function(self)
-    local prio = strsplit("\n", Raiduku.LootWindow.prioList:GetText())
-    local order = prio:match("|cFF00FF00(%d+):")
-    local name = prio:match(": (.+)|r")
-
-    local message = "{rt1} GG "
-
-    message = message .. name .. " (Prio " .. order .. ")"
-    message = message .. " {rt1} " .. Raiduku.Loots[1].link
-    SendChatMessage(message, Raiduku:GetChatType(), nil, nil)
-
-    if Raiduku.Loots[1] then
-        Raiduku:SaveLootForTMB(Raiduku.Loots[1].link, {
-            name = name,
-            plus = 1
-        })
-        Raiduku:AwardPrio(name, order)
-    end
-    if #Raiduku.Loots > 0 then
-        Raiduku.Players = {}
-        startNextLoot()
-    else
-        resetAll()
-    end
-end)
-
-Raiduku.LootWindow.removeLastPlayerButton:SetScript("OnClick", function(self)
-    Raiduku.Players[#Raiduku.Players] = nil
-    local prioNames = {}
-    SendChatMessage("{rt2} Soft Prios (update) {rt2}", Raiduku:GetChatType(), nil, nil)
-    for _, player in ipairs(Raiduku.Players) do
-        tinsert(prioNames, player.name)
-    end
-    SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
-    Raiduku:UpdatePlusRollResults()
 end)
 
 --[[
@@ -462,19 +467,7 @@ function Raiduku:Award(lootIndex, playerName)
     for raiderId = 1, GetNumGroupMembers() do
         local raider = GetMasterLootCandidate(lootIndex, raiderId)
         if raider and raider == playerName then
-            if Raiduku:HasItemInBags(itemId) and playerName ~= UnitName("player") then
-                local unitId = Raiduku:GetGroupUnitType() .. raiderId
-                -- does not work in group ¯\_(ツ)_/¯
-                if CheckInteractDistance(unitId, 2) then
-                    local bag, slot = Raiduku:GetContainerPosition(itemId)
-                    PickupContainerItem(bag, slot)
-                    DropItemOnUnit(unitId)
-                else
-                    SendChatMessage(Raiduku.L["x-come-trade-on-me"]:format(playerName), Raiduku:GetChatType(), nil, nil)
-                end
-            else
-                GiveMasterLoot(lootIndex, raiderId);
-            end
+            GiveMasterLoot(lootIndex, raiderId);
             playerNotFound = false
         end
     end
@@ -507,7 +500,6 @@ function Raiduku:GetSoftResList(itemId)
         end
         for _, resPlayer in next, softres[itemId] do
             if raiders[resPlayer.name] then
-                print(resPlayer.name .. " resa for " .. itemId)
                 tinsert(sotfresList, {
                     name = resPlayer.name,
                     class = resPlayer.class,
@@ -602,19 +594,16 @@ function Raiduku:SaveLootForTMB(loot, winner)
         tinsert(self.db.profile.loot[currentDate], csvRow)
         local spec = note == "OS" and self.L["off-spec"] or self.L["main-spec"]
         C_Timer.NewTimer(0.2, function()
-            self.LootWindow.content:Show()
             self:Print(self.L["saved-for-tmb"]:format(winner.name, itemLink, spec))
         end)
     end
 end
 
 function Raiduku:UpdatePlusRollResults()
-    local results = "\n"
     local missingRollPlayerNames = self:GetMissingRollPlayerNames()
     local winner = self:GetWinner()
     if #missingRollPlayerNames > 0 then
         self.LootWindow.rollsButton:SetEnabled(true)
-        self.LootWindow.winnerButton:Disable()
     else
         self.LootWindow.rollsButton:Disable()
         if winner then
@@ -640,36 +629,21 @@ function Raiduku:UpdatePlusRollResults()
         return leftPlus < rightPlus
     end)
 
+    local tableData = {}
+    Raiduku.RollLootST:SetData(tableData, true)
+
     for _, player in ipairs(self.Players) do
-        results = results .. "|cff" .. self:GetColorByClass(player.class) .. player.name .. "|r"
+        local playerName = player.name
+        local playerPlus = "+" .. player.plus
         if tonumber(player.plus) == 1 then
-            results = results .. " [|cFF00FF00+" .. player.plus .. "|r]"
-        else
-            if tonumber(player.plus) == 2 then
-                results = results .. " [|cFF00D9FF+" .. player.plus .. "|r]"
-            else
-                results = results .. " [+" .. player.plus .. "]"
-            end
+            playerPlus = "|cFF00FF00+" .. player.plus .. "|r"
+        elseif tonumber(player.plus) == 2 then
+            playerPlus = "|cFF00D9FF+" .. player.plus .. "|r"
         end
-        if player.roll then
-            if winner.name and player.name == winner.name then
-                results = results .. " (|cFF00FF00" .. player.roll .. "|r)\n"
-            else
-                results = results .. " (" .. player.roll .. ")"
-            end
-        else
-            local highestPlusPlayers, highestPlus = self:GetHighestPlusPlayers()
-            if player.plus == highestPlus and #highestPlusPlayers == 1 then
-                results = results .. " " .. self.L["auto-win"] .. "\n"
-            elseif player.plus == highestPlus and #highestPlusPlayers > 1 then
-                results = results .. " " .. self.L["waiting-for-roll"]
-            else
-                results = results .. " " .. self.L["auto-pass"]
-            end
-        end
-        results = results .. "\n"
+        tinsert(tableData, { playerName, nil, playerPlus, player.roll })
     end
-    self.LootWindow.content:SetText(results)
+    Raiduku.RollLootST:SetSelection(1)
+    Raiduku.RollLootST:SetData(tableData, true)
 end
 
 --[[
