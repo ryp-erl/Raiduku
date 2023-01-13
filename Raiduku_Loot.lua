@@ -446,12 +446,14 @@ end
 
 function Raiduku:Award(lootIndex, playerName)
     local playerNotFound = true
-    local itemId = Raiduku.Loots[1].link:match("|Hitem:(%d+):")
+    local itemLink = Raiduku.Loots[1].link
+    local itemId = tonumber(itemLink:match("|Hitem:(%d+):"))
     for raiderId = 1, GetNumGroupMembers() do
         local raider = GetMasterLootCandidate(lootIndex, raiderId)
         if raider and raider == playerName then
             GiveMasterLoot(lootIndex, raiderId);
             playerNotFound = false
+            break
         end
     end
     if playerNotFound then
@@ -461,15 +463,29 @@ function Raiduku:Award(lootIndex, playerName)
             SendChatMessage(Raiduku.L["x-come-trade-on-me"]:format(playerName), Raiduku:GetChatType(), nil, nil)
         end
     end
-    tremove(self.Loots, 1)
-end
 
-function Raiduku:AwardPrio(name, order)
-    local itemId = self.Loots[1].link:match("|Hitem:(%d+):")
-    local itemLink = self.Loots[1].link
-    self:Award(self.Loots[1].index, name)
-    tremove(self.db.profile.prios[tonumber(itemId)], order)
-    self:Print(Raiduku.L["removed-x-from-prios-for-x"]:format(name, itemLink))
+    if Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_SOFTRES then
+        local softres = Raiduku.db.profile.softres
+        if softres[itemId] then
+            for index, resPlayer in next, softres[itemId] do
+                if playerName == resPlayer.name then
+                    tremove(softres[itemId], index)
+                    break
+                end
+            end
+        end
+    elseif Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_PRIO then
+        local prios = Raiduku.db.profile.prios
+        local playerNameNoColor = string.match(playerName, "|cFF00FF00(%a+)|r")
+        for index, prioPlayer in next, prios[itemId] do
+            if playerNameNoColor == prioPlayer.name then
+                tremove(prios[itemId], index)
+                self:Print(Raiduku.L["removed-x-from-prios-for-x"]:format(playerNameNoColor, itemLink))
+            end
+        end
+    end
+
+    tremove(self.Loots, 1)
 end
 
 function Raiduku:GetSoftResList(itemId)
