@@ -162,10 +162,10 @@ local function lootLinkedHandler(...)
                     local prioTableData = {}
                     for _, prio in ipairs(prios[itemId]) do
                         if prio.name and raiders[prio.name] then
-                            local prioName = prio.order == 1 and "|cFF00FF00" .. prio.name .. "|r" or prio.name
                             local prioOrder = prio.order == 1 and "|cFF00FF00" .. prio.order .. "|r" or prio.order
                             tinsert(prioList, prio.order .. ": " .. prio.name)
-                            tinsert(prioTableData, { prioName, prioOrder, "+1", nil })
+                            tinsert(prioTableData,
+                                { prio.name, prioOrder, "+1", nil, Raiduku:GetNumAlreadyLooted(prio.name) })
                         end
                     end
                     if #prioList > 0 then
@@ -378,6 +378,30 @@ end)
     Module functions
 --]]
 
+function Raiduku:GetNumAlreadyLooted(playerName)
+    local currentDate = self:GetCurrentDate()
+    local historyTable = Raiduku.db.profile.loot[currentDate]
+    local count = 0
+    if historyTable then
+        for _, csvRow in next, historyTable do
+            local name, note = select(1, strsplit(",", csvRow)), select(5, strsplit(",", csvRow))
+            if playerName == name and note ~= "OS" then
+                count = count + 1
+            end
+        end
+    end
+    local yesterdayDate = date("%F", time() - 24 * 60 * 60)
+    if Raiduku.db.profile.loot[yesterdayDate] then
+        for _, csvRow in next, Raiduku.db.profile.loot[yesterdayDate] do
+            local name, note = select(1, strsplit(",", csvRow)), select(5, strsplit(",", csvRow))
+            if playerName == name and note ~= "OS" then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
 function Raiduku:AddOrUpdatePlayer(name, class, plus)
     local playerIndex = nil
     for index, player in ipairs(self.Players) do
@@ -394,24 +418,10 @@ function Raiduku:AddOrUpdatePlayer(name, class, plus)
             class = class,
             plus = plus,
             roll = nil,
-            loots = {}
+            loots = {},
+            numLooted = Raiduku:GetNumAlreadyLooted(name),
         })
     end
-end
-
-function Raiduku:GetCurrentAndPreviousDate()
-    local loot = self.db.profile.loot
-    local dates = {}
-    local currentDateIndex = nil
-    local index = 0
-    for date, _ in next, loot do
-        index = index + 1
-        tinsert(dates, date)
-        if date == Raiduku:GetCurrentDate() then
-            currentDateIndex = index
-        end
-    end
-    return dates[currentDateIndex], dates[currentDateIndex - 1]
 end
 
 function Raiduku:AutoAwardToRecycler(lootIndex)
@@ -476,11 +486,10 @@ function Raiduku:Award(lootIndex, playerName)
         end
     elseif Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_PRIO then
         local prios = Raiduku.db.profile.prios
-        local playerNameNoColor = string.match(playerName, "|cFF00FF00(%a+)|r")
         for index, prioPlayer in next, prios[itemId] do
-            if playerNameNoColor == prioPlayer.name then
+            if playerName == prioPlayer.name then
                 tremove(prios[itemId], index)
-                self:Print(Raiduku.L["removed-x-from-prios-for-x"]:format(playerNameNoColor, itemLink))
+                self:Print(Raiduku.L["removed-x-from-prios-for-x"]:format(playerName, itemLink))
             end
         end
     end
@@ -639,7 +648,7 @@ function Raiduku:UpdatePlusRollResults()
         elseif tonumber(player.plus) == 2 then
             playerPlus = "|cFF00D9FF+" .. player.plus .. "|r"
         end
-        tinsert(tableData, { playerName, nil, playerPlus, player.roll })
+        tinsert(tableData, { playerName, nil, playerPlus, player.roll, player.numLooted })
     end
     Raiduku.RollLootST:SetSelection(1)
     Raiduku.RollLootST:SetData(tableData, true)

@@ -5,7 +5,7 @@ function Raiduku:DrawLootWindow()
     local defaultPoint = unpack(Raiduku.db.profile.interface.RaidukuLootWindow or { "CENTER", 0, 0 })
     local RaidukuFrameUI = CreateFrame("Frame", "RaidukuLootWindow", UIParent)
     RaidukuFrameUI:SetPoint(defaultPoint)
-    RaidukuFrameUI:SetSize(340, 380)
+    RaidukuFrameUI:SetSize(400, 380)
     RaidukuFrameUI:SetMovable(true)
     RaidukuFrameUI:EnableMouse(true)
     RaidukuFrameUI:RegisterForDrag("LeftButton")
@@ -46,17 +46,22 @@ function Raiduku:DrawLootWindow()
         {
             name = "Prio",
             width = 60,
-            align = "LEFT",
+            align = "CENTER",
         },
         {
             name = "Need",
             width = 60,
-            align = "LEFT",
+            align = "CENTER",
         },
         {
             name = "Roll",
             width = 30,
-            align = "LEFT",
+            align = "CENTER",
+        },
+        {
+            name = "Looted",
+            width = 60,
+            align = "CENTER",
         },
     };
 

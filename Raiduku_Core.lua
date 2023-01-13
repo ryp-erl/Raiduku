@@ -288,13 +288,12 @@ function Raiduku:GetNumSoftRes()
 end
 
 function Raiduku:GetCurrentDate()
-    local now = C_DateAndTime.GetCurrentCalendarTime()
-    return format("%d-%d-%d", now.year, now.month, now.monthDay)
+    return date("%F")
 end
 
 function Raiduku:GetCurrentDateTime()
     local now = C_DateAndTime.GetCurrentCalendarTime()
-    return format("%d-%d-%d %02d:%02d", now.year, now.month, now.monthDay, now.hour, now.minute)
+    return date("%F") .. format(" %02d:%02d", now.hour, now.minute)
 end
 
 function Raiduku:GetColorByClass(class)
