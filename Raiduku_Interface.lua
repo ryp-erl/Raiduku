@@ -1,4 +1,5 @@
 Raiduku.db = Raiduku.db or LibStub("AceDB-3.0"):New("RaidukuLootDB", Raiduku.defaults, true)
+Raiduku.RollLootST = Raiduku.RollLootST or {}
 
 function Raiduku:DrawLootWindow()
     local defaultPoint = unpack(Raiduku.db.profile.interface.RaidukuLootWindow or { "CENTER", 0, 0 })
@@ -35,6 +36,36 @@ function Raiduku:DrawLootWindow()
 
     RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
     RaidukuFrameUI.title:SetPoint("TOPLEFT", 50, -20)
+
+    local columns = {
+        {
+            name = "Player",
+            width = 120,
+            align = "LEFT",
+        },
+        {
+            name = "Prio",
+            width = 60,
+            align = "LEFT",
+        },
+        {
+            name = "Need",
+            width = 60,
+            align = "LEFT",
+        },
+        {
+            name = "Roll",
+            width = 30,
+            align = "LEFT",
+        },
+    };
+
+    Raiduku.RollLootST = Raiduku.ST:CreateST(columns, nil, nil, nil, RaidukuFrameUI);
+    Raiduku.RollLootST.frame:SetPoint("TOPLEFT", 19, -80)
+    Raiduku.RollLootST:EnableSelection(true)
+    Raiduku.RollLootST:SetDefaultHighlight(1.0, 0.9, 0, 0.2)
+    Raiduku.RollLootST:ClearSelection()
+    Raiduku.RollLootST:Hide()
 
     local nowLaterBtnWidth = math.max(#Raiduku.L["now"], #Raiduku.L["later"]) * 10
 

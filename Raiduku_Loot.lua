@@ -1,5 +1,6 @@
 Raiduku.LootWindow = Raiduku:DrawLootWindow()
 Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
+Raiduku.RollLootST = Raiduku.RollLootST or {}
 Raiduku.Loots = {}
 Raiduku.Players = {}
 Raiduku.SoftResList = {}
@@ -43,34 +44,6 @@ Raiduku.LootItemResources = {
     -- Sunmote
     [34664] = true
 }
-Raiduku.LootSTDataColumns = {
-    {
-        name = "Player",
-        width = 120,
-        align = "LEFT",
-    },
-    {
-        name = "Prio",
-        width = 60,
-        align = "LEFT",
-    },
-    {
-        name = "Need",
-        width = 60,
-        align = "LEFT",
-    },
-    {
-        name = "Roll",
-        width = 30,
-        align = "LEFT",
-    },
-};
-Raiduku.RollLootST = Raiduku.ST:CreateST(Raiduku.LootSTDataColumns, nil, nil, nil, Raiduku.LootWindow);
-Raiduku.RollLootST.frame:SetPoint("TOPLEFT", 19, -80)
-Raiduku.RollLootST:EnableSelection(true)
-Raiduku.RollLootST:SetDefaultHighlight(1.0, 0.9, 0, 0.2)
-Raiduku.RollLootST:ClearSelection()
-Raiduku.RollLootST:Hide()
 
 --[[
     Local functions
