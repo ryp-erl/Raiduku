@@ -246,7 +246,7 @@ local function playerPlusHandler(...)
         local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
-        if Raiduku.Loots[1] and plus and #text == 2 then
+        if Raiduku.Loots[1] and plus then
             Raiduku:AddOrUpdatePlayer(name, class, plus)
         end
         Raiduku:UpdatePlusRollResults()
