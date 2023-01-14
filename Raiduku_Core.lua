@@ -308,8 +308,10 @@ end
 function Raiduku:GetRaiders()
     local raiders = {}
     for i = 1, GetNumGroupMembers() do
-        local name = GetRaidRosterInfo(i)
-        tinsert(raiders, name)
+        local name, online = select(1, GetRaidRosterInfo(i)), select(8, GetRaidRosterInfo(i))
+        if online then
+            tinsert(raiders, name)
+        end
     end
     return raiders
 end
