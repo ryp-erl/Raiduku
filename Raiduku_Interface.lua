@@ -39,27 +39,27 @@ function Raiduku:DrawLootWindow()
 
     local columns = {
         {
-            name = "Player",
+            name = Raiduku.L["player"],
             width = 120,
             align = "LEFT",
         },
         {
-            name = "Prio",
+            name = Raiduku.L["prio"],
             width = 60,
             align = "CENTER",
         },
         {
-            name = "Need",
+            name = Raiduku.L["spec"],
             width = 60,
             align = "CENTER",
         },
         {
-            name = "Roll",
+            name = Raiduku.L["roll"],
             width = 30,
             align = "CENTER",
         },
         {
-            name = "Looted",
+            name = Raiduku.L["looted"],
             width = 60,
             align = "CENTER",
         },

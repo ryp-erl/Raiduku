@@ -76,3 +76,10 @@ L["enabled"] = "enabled"
 L["disabled"] = "disabled"
 L["auto-win"] = "|cFF00FF00(Auto-win)|r"
 L["auto-pass"] = "|cff9C9C9C(Auto-pass)|r"
+
+-- Table Columns
+L["player"] = "Player"
+L["prio"] = "Prio"
+L["spec"] = "Spec"
+L["roll"] = "Roll"
+L["looted"] = "Looted"

@@ -81,3 +81,10 @@ L["yes"] = "Oui"
 L["no"] = "Non"
 L["auto-win"] = "|cFF00FF00(Victoire automatique)|r"
 L["auto-pass"] = "|cff9C9C9C(Passe automatique)|r"
+
+-- Table Columns
+L["player"] = "Joueur"
+L["prio"] = "Prio"
+L["spec"] = "Spec"
+L["roll"] = "Jet"
+L["looted"] = "DL"
