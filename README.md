@@ -17,6 +17,17 @@ Minimalist World of Warcraft addon to help raid leaders managing loots in Wrath 
 - Supports [thatsmybis.com](https://thatsmybis.com) (TMB) allowing you to import prios and export loot history (even if manually attributed).
 - Supports [softres.it](https://softres.it) (SR).
 
+## What's new?
+
+With the version 2.0.0:
+
+- **New UI** using [ScrollingTable](https://www.curseforge.com/wow/addons/lib-st) : automatic sorting works the same (+1 / +2, prios and softres) and the first row is automatically selected to attribute to the winner. But in some cases, people are passing or you need to balance loot and the first might not be the one awarded. So now you can select any row and click attribute loot.
+- **New info** : you can now see how many loots for they main spec players have already looted which greatly helps in quick decision making.
+- **New info and action** : you can now see when an item is BoE without having to check the tooltip. When you click on "Recycle loot" it will send it to the ML instead of the recycler.
+- **Fixes** : players should now be properly removed from the imported softres or prios when awarded loots.
+
+![rdk_new_ui](https://github.com/ryp-erl/assets/blob/main/Raiduku/raiduku-2.0.png?raw=true)
+
 ## Documentation
 
 Checkout the [Wiki](https://github.com/En-Roue-Libre/Raiduku/wiki) for more information on how to use this addon.
