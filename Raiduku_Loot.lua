@@ -1,7 +1,6 @@
 Raiduku.LootWindow = Raiduku:DrawLootWindow()
 Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
 Raiduku.RollLootST = Raiduku.RollLootST or {}
-Raiduku.Loots = {}
 Raiduku.Players = {}
 Raiduku.SoftResList = {}
 Raiduku.LootItemTypes = {
@@ -50,15 +49,14 @@ Raiduku.LootItemResources = {
 --]]
 
 local function resetAll()
-    Raiduku.Loots = {}
     Raiduku.Players = {}
     Raiduku.SoftResList = {}
     Raiduku.RollLootST:ClearSelection()
     Raiduku.RollLootST:SetData({}, true)
     Raiduku.RollLootST:Hide()
     Raiduku.LootWindow.title:SetText(nil)
-    Raiduku.LootWindow.image:SetNormalTexture(nil)
-    Raiduku.LootWindow.image:SetPushedTexture(nil)
+    Raiduku.LootWindow.image:SetNormalTexture("")
+    Raiduku.LootWindow.image:SetPushedTexture("")
     Raiduku.LootWindow.startButton:Show()
     Raiduku.LootWindow.laterButton:Show()
     Raiduku.LootWindow.rollsButton:Hide()
@@ -67,12 +65,41 @@ local function resetAll()
     Raiduku.LootWindow:Hide()
 end
 
-local function startNextLoot()
-    C_Timer.NewTimer(0.2, function()
-        if (#Raiduku.Loots > 0) then
-            SendChatMessage(Raiduku.Loots[1].link, Raiduku:GetWarningChatType(), nil, nil)
+local function startNextLootInBags()
+    Raiduku:NewTimer(0.2, function()
+        if Raiduku:GetTableSize(Raiduku.LootsInBags) > 0 then
+            local itemLink = next(Raiduku.LootsInBags)
+            SendChatMessage(itemLink, Raiduku:GetWarningChatType(), nil, nil)
         end
     end)
+end
+
+local function startNextLootOnBoss()
+    Raiduku:NewTimer(0.2, function()
+        if Raiduku:GetTableSize(Raiduku.LootsOnBoss) > 0 then
+            local itemLink = next(Raiduku.LootsOnBoss)
+            SendChatMessage(itemLink, Raiduku:GetWarningChatType(), nil, nil)
+        end
+    end)
+end
+
+local function startNextLoot(onBoss, inBags)
+    if onBoss and Raiduku:GetTableSize(Raiduku.LootsOnBoss) > 0 then
+        Raiduku.Players = {}
+        Raiduku.RollLootST:ClearSelection()
+        Raiduku.RollLootST:SetData({}, true)
+        startNextLootOnBoss()
+    elseif inBags and Raiduku:GetTableSize(Raiduku.LootsInBags) > 0 then
+        Raiduku.Players = {}
+        Raiduku.RollLootST:ClearSelection()
+        Raiduku.RollLootST:SetData({}, true)
+        startNextLootInBags()
+    else
+        resetAll()
+    end
+    Raiduku.RollLootST:ClearSelection()
+    Raiduku.RollLootST:SetData({}, true)
+    Raiduku.LootLinked = nil
 end
 
 local function updateIcon(itemId)
@@ -106,29 +133,35 @@ local function displaySoftResInfo()
     Raiduku:UpdatePlusRollResults()
 end
 
+local function getLootLinkedData()
+    if Raiduku.LootsOnBoss[Raiduku.LootLinked] and #Raiduku.LootsOnBoss[Raiduku.LootLinked] > 0 then
+        return Raiduku.LootsOnBoss[Raiduku.LootLinked]
+    end
+    if Raiduku.LootsInBags[Raiduku.LootLinked] and #Raiduku.LootsInBags[Raiduku.LootLinked] > 0 then
+        return Raiduku.LootsInBags[Raiduku.LootLinked]
+    end
+    return {}
+end
+
 local function lootLinkedHandler(...)
+    Raiduku:DebugLoots()
     local text, name = ...
     local itemId = text:match("|Hitem:(%d+):")
     local playerName = UnitName("player")
     name = strsplit("-", name)
-    if name == playerName and itemId and not (text:find("GG") or text:find("{rt1}")) then
+    if name == playerName and itemId and not (text:find("GG") or text:find("{rt%d}")) then
         local _, itemLink, itemRarity = GetItemInfo(itemId)
         local itemBindType = select(14, GetItemInfo(itemId))
         if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
+            Raiduku.LootLinked = itemLink
+            -- after a reload or getting disconnected we might lose the info of items in bags
+            -- so if an item linked is not found in any list, we add it to loots in bags
+            if not Raiduku.LootsOnBoss[Raiduku.LootLinked] and not Raiduku.LootsInBags[Raiduku.LootLinked] then
+                Raiduku.LootsInBags[Raiduku.LootLinked] = {}
+            end
             local prios = Raiduku.db.profile.prios
             itemId = tonumber(itemId)
-            tinsert(Raiduku.Loots, {
-                link = itemLink,
-                index = 1
-            })
-            Raiduku.Players = {}
-            Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
             updateIcon(itemId)
-            if itemBindType == Raiduku.ItemBindType.BIND_WHEN_EQUIPPED then
-                Raiduku.LootWindow.title:SetText("(BoE) " .. itemLink)
-            else
-                Raiduku.LootWindow.title:SetText(itemLink)
-            end
             Raiduku.LootWindow.startButton:Hide()
             Raiduku.LootWindow.laterButton:Hide()
             Raiduku.LootWindow.rollsButton:Disable()
@@ -136,6 +169,30 @@ local function lootLinkedHandler(...)
             Raiduku.LootWindow.rollsButton:Show()
             Raiduku.LootWindow.winnerButton:Show()
             Raiduku.LootWindow.recycleButton:Show()
+            Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
+            if itemBindType == Raiduku.ItemBindType.BIND_WHEN_EQUIPPED then
+                Raiduku.LootWindow.title:SetText("(BoE) " .. Raiduku.LootLinked)
+            else
+                Raiduku.LootWindow.title:SetText(Raiduku.LootLinked)
+            end
+            local tableData = getLootLinkedData()
+            if tableData then
+                Raiduku.RollLootST:SetSelection(1)
+                Raiduku.RollLootST:SetData(tableData, true)
+                for _, player in next, tableData do
+                    local _, plus = strmatch(player[3], "|cFF00(%a+)+(%d+)|r")
+                    table.insert(Raiduku.Players, {
+                        name = player[1],
+                        class = player[2],
+                        plus = player[3],
+                        roll = player[4],
+                        numLooted = Raiduku:GetNumAlreadyLooted(name),
+                    })
+                end
+                Raiduku.LootWindow.winnerButton:Enable()
+            else
+                Raiduku.Players = {}
+            end
             Raiduku.RollLootST:Show()
             if prios[itemId] then
                 local prioList = {}
@@ -157,6 +214,7 @@ local function lootLinkedHandler(...)
                     if #prioNames > 0 then
                         Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTPRIO
                         SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
+                        -- TODO make sure prios and pluses are saved
                     end
                 else
                     local prioTableData = {}
@@ -224,7 +282,9 @@ end
 
 local function playerRollHandler(...)
     local text = ...
-    if Raiduku.Loots[1] and text:find("(1-100)") then
+    local itemLink = Raiduku.LootsOnBoss and next(Raiduku.LootsOnBoss) or
+        Raiduku.LootsInBags and next(Raiduku.LootsInBags)
+    if itemLink and text:find("(1-100)") then
         local roll = tonumber(text:match("(%d+)"))
         local playerName = strsplit(" ", text)
         for _, player in ipairs(Raiduku.Players) do
@@ -246,26 +306,26 @@ local function playerPlusHandler(...)
         local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
-        if Raiduku.Loots[1] and plus then
+        local loots = Raiduku.LootsOnBoss or Raiduku.LootsInBags or nil
+        if loots and plus then
             Raiduku:AddOrUpdatePlayer(name, class, plus)
+            Raiduku:UpdatePlusRollResults()
         end
-        Raiduku:UpdatePlusRollResults()
     end
 end
 
 local function lootOpenedHandler()
+    local loots = {}
     for i = 1, GetNumLootItems() do
         if (LootSlotHasItem(i)) then
             local itemLink = GetLootSlotLink(i)
             if itemLink then
+                local rarityFromConfig = Raiduku.db.profile.autoAwardRare and 4 or 3
                 local itemRarity = select(3, GetItemInfo(itemLink))
                 local itemId = itemLink:match("|Hitem:(%d+):")
-                if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil
+                if itemRarity >= rarityFromConfig and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil
                     and Raiduku.LootItemResources[tonumber(itemId)] == nil then
-                    tinsert(Raiduku.Loots, {
-                        link = itemLink,
-                        index = i
-                    })
+                    tinsert(loots, itemLink)
                 end
                 if Raiduku.LootItemResources[tonumber(itemId)] then
                     Raiduku:Print(Raiduku.L["auto-awarding"] .. " " .. itemLink)
@@ -282,7 +342,8 @@ local function lootOpenedHandler()
             end
         end
     end
-    if #Raiduku.Loots > 0 then
+    if #loots > 0 then
+        Raiduku:SaveLootsOnBoss(loots)
         Raiduku.LootWindow:Show()
     end
 end
@@ -298,42 +359,46 @@ end)
 Raiduku.LootWindow.startButton:SetScript("OnClick", function(self)
     self:Hide()
     Raiduku.LootWindow.laterButton:Hide()
-    if #Raiduku.Loots > 0 then
+    if Raiduku:GetTableSize(Raiduku.LootsOnBoss) > 0 then
         Raiduku.RollLootST:Show()
-        startNextLoot()
+        startNextLootOnBoss()
     end
 end)
 
 Raiduku.LootWindow.laterButton:SetScript("OnClick", function()
     SendChatMessage(Raiduku.L["loot-later"], Raiduku:GetWarningChatType(), nil, nil)
-    while Raiduku.Loots[1] do
-        SendChatMessage("{rt1} " .. Raiduku.Loots[1].link, Raiduku:GetChatType(), nil, nil)
-        Raiduku:Award(Raiduku.Loots[1].index, UnitName("player"))
+    local i = 1
+    for itemLink in next, Raiduku.LootsOnBoss do
+        Raiduku.LootLinked = itemLink
+        SendChatMessage("{rt1} " .. itemLink, Raiduku:GetChatType(), nil, nil)
+        Raiduku:Award(Raiduku:GetLootIndex(itemLink), UnitName("player"))
+        Raiduku.LootsInBags[itemLink] = {}
+        Raiduku.LootsOnBoss[itemLink] = nil
+        i = i + 1
     end
-    Raiduku.Loots = {}
     Raiduku.RollLootST:ClearSelection()
     Raiduku.RollLootST:SetData({}, true)
     Raiduku.RollLootST:Hide()
     Raiduku.LootWindow:Hide()
+    -- startNextLootInBags()
 end)
 
 Raiduku.LootWindow.recycleButton:SetScript("OnClick", function()
-    local itemBindType = select(14, GetItemInfo(Raiduku.Loots[1].link))
-    if Raiduku.Loots[1] then
+    local onBoss = Raiduku.LootsOnBoss[Raiduku.LootLinked] and true
+    local inBags = Raiduku.LootsInBags[Raiduku.LootLinked] and true
+    local itemLink = Raiduku.LootLinked
+    local itemBindType = select(14, GetItemInfo(itemLink))
+    if itemLink then
         if itemBindType == Raiduku.ItemBindType.BIND_WHEN_EQUIPPED then
-            Raiduku:Award(Raiduku.Loots[1].index, UnitName("player"))
+            SendChatMessage("{rt4} (BoE) " .. itemLink .. " ==> " .. UnitName("player"), Raiduku:GetChatType(), nil, nil)
+            Raiduku:Award(Raiduku:GetLootIndex(itemLink), UnitName("player"))
         else
-            Raiduku:Award(Raiduku.Loots[1].index, Raiduku.recycler)
+            SendChatMessage("{rt7} " .. Raiduku.L["x-will-recycle-x"]:format(Raiduku.recycler, itemLink),
+                Raiduku:GetChatType(), nil, nil)
+            Raiduku:Award(Raiduku:GetLootIndex(itemLink), Raiduku.recycler)
         end
     end
-    if #Raiduku.Loots > 0 then
-        Raiduku.Players = {}
-        Raiduku.RollLootST:ClearSelection()
-        Raiduku.RollLootST:SetData({}, true)
-        startNextLoot()
-    else
-        resetAll()
-    end
+    startNextLoot(onBoss, inBags)
 end)
 
 Raiduku.LootWindow.rollsButton:SetScript("OnClick", function()
@@ -344,6 +409,9 @@ end)
 
 Raiduku.LootWindow.winnerButton:SetScript("OnClick", function()
     local selectedPlayer = Raiduku.RollLootST:GetRow(Raiduku.RollLootST:GetSelection())
+    local itemLink = Raiduku.LootLinked
+    local onBoss = Raiduku.LootsOnBoss[Raiduku.LootLinked] and true
+    local inBags = Raiduku.LootsInBags[Raiduku.LootLinked] and true
     local winner = {
         ["name"] = selectedPlayer[1],
         ["prio"] = selectedPlayer[2],
@@ -358,25 +426,81 @@ Raiduku.LootWindow.winnerButton:SetScript("OnClick", function()
         message = message .. " (" .. winner.roll .. ")"
     end
 
-    message = message .. " {rt1} " .. Raiduku.Loots[1].link
+    message = message .. " {rt1} " .. itemLink
 
     SendChatMessage(message, Raiduku:GetChatType(), nil, nil)
 
-    if Raiduku.Loots[1] then
-        Raiduku:SaveLootForTMB(Raiduku.Loots[1].link, winner)
-        Raiduku:Award(Raiduku.Loots[1].index, winner.name)
+    if itemLink then
+        Raiduku:SaveLootForTMB(itemLink, winner)
+        Raiduku:Award(Raiduku:GetLootIndex(itemLink), winner.name)
     end
-    if #Raiduku.Loots > 0 then
-        Raiduku.Players = {}
-        startNextLoot()
-    else
-        resetAll()
-    end
+
+    startNextLoot(onBoss, inBags)
 end)
 
 --[[
     Module functions
 --]]
+
+function Raiduku:DebugLoots()
+    if Raiduku.LootLinked then
+        print("-- Loot linked --")
+        print(Raiduku.LootLinked)
+    end
+    if Raiduku.LootsOnBoss then
+        print("-- Loots on boss --")
+        for item, players in next, Raiduku.LootsOnBoss do
+            print(item)
+            for _, player in next, players do
+                print(player[0])
+            end
+        end
+    end
+    if Raiduku.LootsInBags then
+        print("-- Loots in bags --")
+        for item, players in next, Raiduku.LootsInBags do
+            print(item)
+            for _, player in next, players do
+                print(player[0])
+            end
+        end
+    end
+    if Raiduku.LootsToTrade then
+        print("-- Loots to trade --")
+        for _, item in next, Raiduku.LootsToTrade do
+            print(item)
+        end
+    end
+end
+
+function Raiduku:SaveLootsOnBoss(itemLinks)
+    if not Raiduku.LootsOnBoss or Raiduku:GetTableSize(Raiduku.LootsOnBoss) == 0 then
+        for _, itemLink in next, itemLinks do
+            Raiduku.LootsOnBoss[itemLink] = {}
+        end
+    end
+end
+
+function Raiduku:GetLootIndex(itemLink)
+    for i = 1, GetNumLootItems() do
+        if (LootSlotHasItem(i)) then
+            local lootItemLink = GetLootSlotLink(i)
+            if lootItemLink == itemLink then
+                return i
+            end
+        end
+    end
+end
+
+function Raiduku:IsToTrade(itemId)
+    local itemLink = select(2, GetItemInfo(itemId))
+    for _, lootToTrade in next, Raiduku.LootsToTrade do
+        if itemLink == lootToTrade then
+            return true
+        end
+    end
+    return false
+end
 
 function Raiduku:GetNumAlreadyLooted(playerName)
     local currentDate = self:GetCurrentDate()
@@ -418,7 +542,6 @@ function Raiduku:AddOrUpdatePlayer(name, class, plus)
             class = class,
             plus = plus,
             roll = nil,
-            loots = {},
             numLooted = Raiduku:GetNumAlreadyLooted(name),
         })
     end
@@ -456,21 +579,35 @@ end
 
 function Raiduku:Award(lootIndex, playerName)
     local playerNotFound = true
-    local itemLink = Raiduku.Loots[1].link
+    local itemLink = Raiduku.LootLinked
     local itemId = tonumber(itemLink:match("|Hitem:(%d+):"))
-    for raiderId = 1, GetNumGroupMembers() do
-        local raider = GetMasterLootCandidate(lootIndex, raiderId)
-        if raider and raider == playerName then
-            GiveMasterLoot(lootIndex, raiderId);
-            playerNotFound = false
-            break
+    if lootIndex then
+        for raiderId = 1, GetNumGroupMembers() do
+            local raider = GetMasterLootCandidate(lootIndex, raiderId)
+            if raider and raider == playerName then
+                GiveMasterLoot(lootIndex, raiderId);
+                playerNotFound = false
+                break
+            end
         end
-    end
-    if playerNotFound then
+        if playerNotFound then
+            self:Print(self.L["cannot-award-to"]:format(playerName))
+            GiveMasterLoot(lootIndex, 1);
+            if Raiduku:HasItemInBags(itemId) and playerName ~= UnitName("player") then
+                SendChatMessage(Raiduku.L["x-come-trade-on-me"]:format(playerName), Raiduku:GetChatType(), nil, nil)
+                tinsert(Raiduku.LootsToTrade, itemLink)
+                Raiduku.LootsInBags[itemLink] = nil
+            end
+        end
+        Raiduku.LootsOnBoss[itemLink] = nil
+    else
         self:Print(self.L["cannot-award-to"]:format(playerName))
-        GiveMasterLoot(lootIndex, 1);
-        if Raiduku:HasItemInBags(itemId) and playerName ~= UnitName("player") then
-            SendChatMessage(Raiduku.L["x-come-trade-on-me"]:format(playerName), Raiduku:GetChatType(), nil, nil)
+        if Raiduku.LootsInBags[itemLink] and Raiduku:HasItemInBags(itemId) then
+            if playerName ~= UnitName("player") then
+                SendChatMessage(Raiduku.L["x-come-trade-on-me"]:format(playerName), Raiduku:GetChatType(), nil, nil)
+                tinsert(Raiduku.LootsToTrade, itemLink)
+            end
+            Raiduku.LootsInBags[itemLink] = nil
         end
     end
 
@@ -493,8 +630,6 @@ function Raiduku:Award(lootIndex, playerName)
             end
         end
     end
-
-    tremove(self.Loots, 1)
 end
 
 function Raiduku:GetSoftResList(itemId)
@@ -652,6 +787,11 @@ function Raiduku:UpdatePlusRollResults()
     end
     Raiduku.RollLootST:SetSelection(1)
     Raiduku.RollLootST:SetData(tableData, true)
+    if Raiduku.LootsOnBoss[Raiduku.LootLinked] then
+        Raiduku.LootsOnBoss[Raiduku.LootLinked] = tableData
+    elseif Raiduku.LootsInBags[Raiduku.LootLinked] then
+        Raiduku.LootsInBags[Raiduku.LootLinked] = tableData
+    end
 end
 
 --[[
@@ -711,9 +851,9 @@ function Raiduku:TRADE_SHOW(event, ...)
         for _, row in next, loots do
             local name, _, itemId = strsplit(",", row)
             if name == tradeTargetName then
-                if Raiduku:HasItemInBags(itemId) then
+                if Raiduku:HasItemInBags(itemId) and Raiduku:IsToTrade(itemId) then
                     local bag, slot = Raiduku:GetContainerPosition(itemId)
-                    UseContainerItem(bag, slot);
+                    Raiduku:UseContainerItem(bag, slot);
                 end
             end
         end

@@ -34,7 +34,7 @@ function Raiduku:DrawLootWindow()
     RaidukuFrameUI.image:SetHeight(32)
     RaidukuFrameUI.image:SetPoint("TOPLEFT", 10, -10)
 
-    RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
+    RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     RaidukuFrameUI.title:SetPoint("TOPLEFT", 50, -20)
 
     local columns = {
@@ -243,7 +243,9 @@ function Raiduku:DrawExportWindow()
 
     local dates = {}
     for date, _ in pairs(self.db.profile.loot) do
-        tinsert(dates, date)
+        if strmatch(date, "(%d+)-(%d+)-(%d+)") then
+            tinsert(dates, date)
+        end
     end
 
     table.sort(dates, function(left, right)

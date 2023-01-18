@@ -30,6 +30,7 @@ L["softres-invalid-import"] =
 "|cffff0000Invalid import|r: first line is not a valid or supported header from |cff1eff00softres.it|r"
 L["loot-later"] = "{rt6} Loot Attribution Later {rt6}"
 L["x-come-trade-on-me"] = "%s ==> TRADE on me"
+L["x-will-recycle-x"] = "%s will recycle %s"
 L["removed-x-from-prios-for-x"] = "Removed %s from your imported prios for %s"
 L["trade-back-loot-history"] = "%s gave you back %s. How do you want to update loot history?"
 L["removed-data-from-x-dates"] = "Removed data from the following dates: %s"

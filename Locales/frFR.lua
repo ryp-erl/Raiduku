@@ -35,6 +35,7 @@ L["softres-invalid-import"] =
 "|cffff0000Import erroné|r: la première ligne n'est pas un en-tête valide ou supporté de |cff1eff00softres.it|r"
 L["loot-later"] = "{rt6} Attribution du butin plus tard {rt6}"
 L["x-come-trade-on-me"] = "%s ==> ÉCHANGE avec moi"
+L["x-will-recycle-x"] = "%s va recycler %s"
 L["removed-x-from-prios-for-x"] = "%s a été retiré des prios importées pour %s"
 L["trade-back-loot-history"] = "%s t'a rendu %s. Veux-tu mettre à jour l'historique de loot ?"
 L["removed-data-from-x-dates"] = "Données supprimées pour les dates suivantes: %s"

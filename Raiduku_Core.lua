@@ -89,6 +89,20 @@ function Raiduku:OnInitialize()
             end
         end
     end
+    -- Raiduku.db.profile.loot.linked = nil
+    -- Raiduku.db.profile.loot.onBoss = {}
+    -- Raiduku.db.profile.loot.inBags = {}
+    -- Raiduku.db.profile.loot.toTrade = {}
+
+    Raiduku.db.profile.loot.linked = Raiduku.db.profile.loot.linked or nil
+    Raiduku.db.profile.loot.onBoss = Raiduku.db.profile.loot.onBoss or {}
+    Raiduku.db.profile.loot.inBags = Raiduku.db.profile.loot.inBags or {}
+    Raiduku.db.profile.loot.toTrade = Raiduku.db.profile.loot.toTrade or {}
+
+    Raiduku.LootLinked = Raiduku.db.profile.loot.linked
+    Raiduku.LootsOnBoss = Raiduku.db.profile.loot.onBoss
+    Raiduku.LootsInBags = Raiduku.db.profile.loot.inBags
+    Raiduku.LootsToTrade = Raiduku.db.profile.loot.toTrade
 end
 
 function Raiduku:OnEnable()
@@ -287,6 +301,14 @@ function Raiduku:GetNumSoftRes()
     return numSoftRes
 end
 
+function Raiduku:GetTableSize(table)
+    local count = 0
+    for _ in next, table do
+        count = count + 1
+    end
+    return count
+end
+
 function Raiduku:GetCurrentDate()
     return date("%F")
 end
@@ -321,10 +343,25 @@ function Raiduku:GetPlayerName(playerFullName)
     return string.sub(playerFullName, 0, realmSeparatorPosition - 1)
 end
 
+function Raiduku:GetContainerNumSlots(bagId)
+    local getContainerNumSlots = GetContainerNumSlots or (C_Container and C_Container.GetContainerNumSlots)
+    return getContainerNumSlots(bagId)
+end
+
+function Raiduku:GetContainerItemInfo(bagId, slotId)
+    local getContainerItemInfo = GetContainerItemInfo or (C_Container and C_Container.GetContainerItemInfo)
+    return getContainerItemInfo(bagId, slotId)
+end
+
+function Raiduku:UseContainerItem(containerIndex, slotIndex, unitToken, reagentBankOpen)
+    local useContainerItem = UseContainerItem or (C_Container and C_Container.UseContainerItem)
+    return useContainerItem(containerIndex, slotIndex, unitToken, reagentBankOpen)
+end
+
 function Raiduku:GetContainerPosition(itemId)
     for bag = 0, NUM_BAG_SLOTS do
-        for slot = 1, GetContainerNumSlots(bag) do
-            local currentItemId = select(10, GetContainerItemInfo(bag, slot))
+        for slot = 1, Raiduku:GetContainerNumSlots(bag) do
+            local currentItemId = select(10, Raiduku:GetContainerItemInfo(bag, slot))
             if currentItemId == tonumber(itemId) then
                 return bag, slot
             end
@@ -336,8 +373,8 @@ end
 function Raiduku:GetBagItemIds()
     local itemIds = {}
     for bag = 0, NUM_BAG_SLOTS do
-        for slot = 1, GetContainerNumSlots(bag) do
-            local itemId = select(10, GetContainerItemInfo(bag, slot))
+        for slot = 1, Raiduku:GetContainerNumSlots(bag) do
+            local itemId = select(10, Raiduku:GetContainerItemInfo(bag, slot))
             if itemId then
                 itemIds[itemId] = true
             end
@@ -366,4 +403,8 @@ function Raiduku:GetWarningChatType()
         local rank = select(2, GetRaidRosterInfo(1))
         return rank > 0 and "RAID_WARNING" or "RAID"
     end
+end
+
+function Raiduku:NewTimer(seconds, callback)
+    return C_Timer.NewTimer(seconds, callback) or C_Timer.NewTicker(seconds, callback, 1)
 end
