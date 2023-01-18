@@ -34,7 +34,7 @@ function Raiduku:DrawLootWindow()
     RaidukuFrameUI.image:SetHeight(32)
     RaidukuFrameUI.image:SetPoint("TOPLEFT", 10, -10)
 
-    RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(RaidukuFrameUI, "OVERLAY", "GameFontNormal")
+    RaidukuFrameUI.title = RaidukuFrameUI:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     RaidukuFrameUI.title:SetPoint("TOPLEFT", 50, -20)
 
     local columns = {

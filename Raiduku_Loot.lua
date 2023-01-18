@@ -57,8 +57,8 @@ local function resetAll()
     Raiduku.RollLootST:SetData({}, true)
     Raiduku.RollLootST:Hide()
     Raiduku.LootWindow.title:SetText(nil)
-    Raiduku.LootWindow.image:SetNormalTexture(nil)
-    Raiduku.LootWindow.image:SetPushedTexture(nil)
+    Raiduku.LootWindow.image:SetNormalTexture("")
+    Raiduku.LootWindow.image:SetPushedTexture("")
     Raiduku.LootWindow.startButton:Show()
     Raiduku.LootWindow.laterButton:Show()
     Raiduku.LootWindow.rollsButton:Hide()
@@ -68,7 +68,7 @@ local function resetAll()
 end
 
 local function startNextLoot()
-    C_Timer.NewTimer(0.2, function()
+    Raiduku:NewTimer(0.2, function()
         if (#Raiduku.Loots > 0) then
             SendChatMessage(Raiduku.Loots[1].link, Raiduku:GetWarningChatType(), nil, nil)
         end
@@ -713,7 +713,7 @@ function Raiduku:TRADE_SHOW(event, ...)
             if name == tradeTargetName then
                 if Raiduku:HasItemInBags(itemId) then
                     local bag, slot = Raiduku:GetContainerPosition(itemId)
-                    UseContainerItem(bag, slot);
+                    Raiduku:UseContainerItem(bag, slot);
                 end
             end
         end
