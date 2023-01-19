@@ -144,7 +144,6 @@ local function getLootLinkedData()
 end
 
 local function lootLinkedHandler(...)
-    Raiduku:DebugLoots()
     local text, name = ...
     local itemId = text:match("|Hitem:(%d+):")
     local playerName = UnitName("player")
@@ -249,6 +248,7 @@ local function lootLinkedHandler(...)
                 Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
             end
             Raiduku.LootWindow:Show()
+            Raiduku:DebugLoots()
         end
     end
 end
@@ -294,6 +294,7 @@ local function playerRollHandler(...)
         end
         if Raiduku.LootMode ~= Raiduku.Constants.LOOT_MODE_PRIO then
             Raiduku:UpdatePlusRollResults()
+            Raiduku:DebugLoots()
         end
     end
 end
@@ -310,6 +311,7 @@ local function playerPlusHandler(...)
         if loots and plus then
             Raiduku:AddOrUpdatePlayer(name, class, plus)
             Raiduku:UpdatePlusRollResults()
+            Raiduku:DebugLoots()
         end
     end
 end
@@ -443,32 +445,37 @@ end)
 --]]
 
 function Raiduku:DebugLoots()
+    local prefix = "|cffffe600[DEBUG]|r "
     if Raiduku.LootLinked then
-        print("-- Loot linked --")
-        print(Raiduku.LootLinked)
+        Raiduku:Print(prefix .. "Loot linked:")
+        Raiduku:Print(prefix .. Raiduku.LootLinked)
     end
     if Raiduku.LootsOnBoss then
-        print("-- Loots on boss --")
+        Raiduku:Print(prefix .. "Loots on |cffcc1919boss|r (" .. Raiduku:GetTableSize(Raiduku.LootsOnBoss) .. "): ")
         for item, players in next, Raiduku.LootsOnBoss do
-            print(item)
+            local playerNames = ""
             for _, player in next, players do
-                print(player[0])
+                playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
             end
+            local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or prefix .. item
+            Raiduku:Print(itemAndPlayers)
         end
     end
     if Raiduku.LootsInBags then
-        print("-- Loots in bags --")
+        Raiduku:Print(prefix .. "Loots in |cff40c040bags|r: (" .. Raiduku:GetTableSize(Raiduku.LootsInBags) .. "): ")
         for item, players in next, Raiduku.LootsInBags do
-            print(item)
+            local playerNames = ""
             for _, player in next, players do
-                print(player[0])
+                playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
             end
+            local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or prefix .. item
+            Raiduku:Print(itemAndPlayers)
         end
     end
     if Raiduku.LootsToTrade then
-        print("-- Loots to trade --")
+        Raiduku:Print(prefix .. "Loots to |cff00ccfftrade|r: (" .. Raiduku:GetTableSize(Raiduku.LootsToTrade) .. "): ")
         for _, item in next, Raiduku.LootsToTrade do
-            print(item)
+            Raiduku:Print(prefix .. item)
         end
     end
 end
@@ -514,7 +521,7 @@ function Raiduku:GetNumAlreadyLooted(playerName)
             end
         end
     end
-    local yesterdayDate = date("%F", time() - 24 * 60 * 60)
+    local yesterdayDate = Raiduku:GetYesterdayDate()
     if Raiduku.db.profile.loot[yesterdayDate] then
         for _, csvRow in next, Raiduku.db.profile.loot[yesterdayDate] do
             local name, note = select(1, strsplit(",", csvRow)), select(5, strsplit(",", csvRow))
@@ -630,6 +637,7 @@ function Raiduku:Award(lootIndex, playerName)
             end
         end
     end
+    Raiduku:DebugLoots()
 end
 
 function Raiduku:GetSoftResList(itemId)
@@ -851,7 +859,7 @@ function Raiduku:TRADE_SHOW(event, ...)
         for _, row in next, loots do
             local name, _, itemId = strsplit(",", row)
             if name == tradeTargetName then
-                if Raiduku:HasItemInBags(itemId) and Raiduku:IsToTrade(itemId) then
+                if Raiduku:IsTradeable(itemId) and Raiduku:IsToTrade(itemId) then
                     local bag, slot = Raiduku:GetContainerPosition(itemId)
                     Raiduku:UseContainerItem(bag, slot);
                 end
