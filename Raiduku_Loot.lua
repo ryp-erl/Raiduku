@@ -55,8 +55,7 @@ local function resetAll()
     Raiduku.RollLootST:SetData({}, true)
     Raiduku.RollLootST:Hide()
     Raiduku.LootWindow.title:SetText(nil)
-    Raiduku.LootWindow.image:SetNormalTexture("")
-    Raiduku.LootWindow.image:SetPushedTexture("")
+    Raiduku.LootWindow.image:Hide()
     Raiduku.LootWindow.startButton:Show()
     Raiduku.LootWindow.laterButton:Show()
     Raiduku.LootWindow.rollsButton:Hide()
@@ -106,6 +105,7 @@ local function updateIcon(itemId)
     local itemIcon = GetItemIcon(itemId)
     Raiduku.LootWindow.image:SetNormalTexture(itemIcon)
     Raiduku.LootWindow.image:SetPushedTexture(itemIcon)
+    Raiduku.LootWindow.image:Show()
     Raiduku.LootWindow.image:SetScript("OnEnter", function()
         local itemLink = select(2, GetItemInfo(itemId))
         GameTooltip:SetOwner(Raiduku.LootWindow, "ANCHOR_CURSOR")
@@ -127,7 +127,7 @@ local function displaySoftResInfo()
     for _, player in ipairs(Raiduku.SoftResList) do
         if raiders[player.name] then
             SendChatMessage(player.name, Raiduku:GetChatType(), nil, nil)
-            Raiduku:AddOrUpdatePlayer(player.name, player.class, 1)
+            Raiduku:AddOrUpdatePlayer(player.name, 1)
         end
     end
     Raiduku:UpdatePlusRollResults()
@@ -152,6 +152,7 @@ local function lootLinkedHandler(...)
         local _, itemLink, itemRarity = GetItemInfo(itemId)
         local itemBindType = select(14, GetItemInfo(itemId))
         if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
+            Raiduku.Players = {}
             Raiduku.LootLinked = itemLink
             -- after a reload or getting disconnected we might lose the info of items in bags
             -- so if an item linked is not found in any list, we add it to loots in bags
@@ -179,60 +180,55 @@ local function lootLinkedHandler(...)
                 Raiduku.RollLootST:SetSelection(1)
                 Raiduku.RollLootST:SetData(tableData, true)
                 for _, player in next, tableData do
-                    local _, plus = strmatch(player[3], "|cFF00(%a+)+(%d+)|r")
+                    local plus = strmatch(player[3], "+(%d+)")
                     table.insert(Raiduku.Players, {
                         name = player[1],
-                        class = player[2],
-                        plus = player[3],
+                        order = player[2],
+                        plus = tonumber(plus),
                         roll = player[4],
                         numLooted = Raiduku:GetNumAlreadyLooted(name),
                     })
                 end
                 Raiduku.LootWindow.winnerButton:Enable()
-            else
-                Raiduku.Players = {}
             end
             Raiduku.RollLootST:Show()
             if prios[itemId] then
-                local prioList = {}
                 local raiders = {}
+                local prioTableData = {}
+                local prioNames = {}
                 for i = 1, GetNumGroupMembers() do
                     local raiderName = GetRaidRosterInfo(i)
                     raiders[raiderName] = true
                 end
-                if Raiduku.db.profile.enableSoftPrio then
-                    SendChatMessage("{rt2} Soft Prios {rt2}", Raiduku:GetChatType(), nil, nil)
-                    local prioNames = {}
-                    for _, prio in ipairs(prios[itemId]) do
-                        if prio.name and raiders[prio.name] then
-                            tinsert(prioNames, prio.name)
-                            Raiduku:AddOrUpdatePlayer(prio.name, prio.class, 1)
+                for _, prio in ipairs(prios[itemId]) do
+                    if prio.name and raiders[prio.name] then
+                        tinsert(prioNames, prio.name)
+                        tinsert(prioTableData,
+                            { prio.name, prio.order, "+1", nil, Raiduku:GetNumAlreadyLooted(prio.name) })
+                            Raiduku:AddOrUpdatePlayer(prio.name, 1, prio.order)
                             Raiduku:UpdatePlusRollResults()
-                        end
                     end
+                end
+                if tableData and Raiduku:GetTableSize(tableData) > 0 then
+                    prioTableData = tableData
+                end
+                if Raiduku:GetTableSize(prioTableData) > 0 then
+                    Raiduku.RollLootST:SetSelection(1)
+                    Raiduku.RollLootST:SetData(prioTableData, true)
+                    Raiduku.LootWindow.winnerButton:SetEnabled(true)
+                end
+                if Raiduku.db.profile.enableSoftPrio then
+                    Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTPRIO
                     if #prioNames > 0 then
-                        Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTPRIO
+                        SendChatMessage("{rt2} Soft Prios {rt2}", Raiduku:GetChatType(), nil, nil)
                         SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
-                        -- TODO make sure prios and pluses are saved
                     end
                 else
-                    local prioTableData = {}
-                    for _, prio in ipairs(prios[itemId]) do
-                        if prio.name and raiders[prio.name] then
-                            local prioOrder = prio.order == 1 and "|cFF00FF00" .. prio.order .. "|r" or prio.order
-                            tinsert(prioList, prio.order .. ": " .. prio.name)
-                            tinsert(prioTableData,
-                                { prio.name, prioOrder, "+1", nil, Raiduku:GetNumAlreadyLooted(prio.name) })
-                        end
-                    end
-                    if #prioList > 0 then
-                        Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_PRIO
-                        Raiduku.RollLootST:SetSelection(1)
-                        Raiduku.RollLootST:SetData(prioTableData, true)
-                        Raiduku.LootWindow.winnerButton:SetEnabled(true)
+                    Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_PRIO
+                    if Raiduku:GetTableSize(prioTableData) > 0 then
                         SendChatMessage("{rt2} Prios {rt2}", Raiduku:GetChatType(), nil, nil)
-                        for _, prio in ipairs(prioList) do
-                            SendChatMessage(prio, Raiduku:GetChatType(), nil, nil)
+                        for _, prio in ipairs(prioTableData) do
+                            SendChatMessage(prio[2] .. ": " .. prio[1], Raiduku:GetChatType(), nil, nil)
                         end
                     else
                         Raiduku.SoftResList = Raiduku:GetSoftResList(itemId)
@@ -248,7 +244,7 @@ local function lootLinkedHandler(...)
                 Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
             end
             Raiduku.LootWindow:Show()
-            Raiduku:DebugLoots()
+            -- Raiduku:DebugLoots()
         end
     end
 end
@@ -294,7 +290,7 @@ local function playerRollHandler(...)
         end
         if Raiduku.LootMode ~= Raiduku.Constants.LOOT_MODE_PRIO then
             Raiduku:UpdatePlusRollResults()
-            Raiduku:DebugLoots()
+            -- Raiduku:DebugLoots()
         end
     end
 end
@@ -303,15 +299,15 @@ local function playerPlusHandler(...)
     if Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_ROLL or
         Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_SOFTPRIO then
         local text, player = ...
-        local guid = select(12, ...)
-        local _, class = GetPlayerInfoByGUID(guid)
+        -- local guid = select(12, ...)
+        -- local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
         local loots = Raiduku.LootsOnBoss or Raiduku.LootsInBags or nil
-        if loots and plus then
-            Raiduku:AddOrUpdatePlayer(name, class, plus)
+        if loots and plus and not (text:find("GG") or text:find("{rt%d}")) then
+            Raiduku:AddOrUpdatePlayer(name, plus)
             Raiduku:UpdatePlusRollResults()
-            Raiduku:DebugLoots()
+            -- Raiduku:DebugLoots()
         end
     end
 end
@@ -533,7 +529,7 @@ function Raiduku:GetNumAlreadyLooted(playerName)
     return count
 end
 
-function Raiduku:AddOrUpdatePlayer(name, class, plus)
+function Raiduku:AddOrUpdatePlayer(name, plus, prio)
     local playerIndex = nil
     for index, player in ipairs(self.Players) do
         if player.name == name then
@@ -546,7 +542,7 @@ function Raiduku:AddOrUpdatePlayer(name, class, plus)
     else
         table.insert(self.Players, {
             name = name,
-            class = class,
+            order = prio,
             plus = plus,
             roll = nil,
             numLooted = Raiduku:GetNumAlreadyLooted(name),
@@ -637,7 +633,7 @@ function Raiduku:Award(lootIndex, playerName)
             end
         end
     end
-    Raiduku:DebugLoots()
+    -- Raiduku:DebugLoots()
 end
 
 function Raiduku:GetSoftResList(itemId)
@@ -653,7 +649,7 @@ function Raiduku:GetSoftResList(itemId)
             if raiders[resPlayer.name] then
                 tinsert(sotfresList, {
                     name = resPlayer.name,
-                    class = resPlayer.class,
+                    order = nil,
                     plus = resPlayer.plus,
                     roll = nil,
                     loots = {}
@@ -786,12 +782,7 @@ function Raiduku:UpdatePlusRollResults()
     for _, player in ipairs(self.Players) do
         local playerName = player.name
         local playerPlus = "+" .. player.plus
-        if tonumber(player.plus) == 1 then
-            playerPlus = "|cFF00FF00+" .. player.plus .. "|r"
-        elseif tonumber(player.plus) == 2 then
-            playerPlus = "|cFF00D9FF+" .. player.plus .. "|r"
-        end
-        tinsert(tableData, { playerName, nil, playerPlus, player.roll, player.numLooted })
+        tinsert(tableData, { playerName, player.order, playerPlus, player.roll, player.numLooted })
     end
     Raiduku.RollLootST:SetSelection(1)
     Raiduku.RollLootST:SetData(tableData, true)

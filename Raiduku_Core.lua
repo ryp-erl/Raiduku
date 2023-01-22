@@ -89,15 +89,15 @@ function Raiduku:OnInitialize()
             end
         end
     end
-    Raiduku.db.profile.loot.linked = nil
-    Raiduku.db.profile.loot.onBoss = {}
-    Raiduku.db.profile.loot.inBags = {}
-    Raiduku.db.profile.loot.toTrade = {}
+    -- Raiduku.db.profile.loot.linked = nil
+    -- Raiduku.db.profile.loot.onBoss = {}
+    -- Raiduku.db.profile.loot.inBags = {}
+    -- Raiduku.db.profile.loot.toTrade = {}
 
-    -- Raiduku.db.profile.loot.linked = Raiduku.db.profile.loot.linked or nil
-    -- Raiduku.db.profile.loot.onBoss = Raiduku.db.profile.loot.onBoss or {}
-    -- Raiduku.db.profile.loot.inBags = Raiduku.db.profile.loot.inBags or {}
-    -- Raiduku.db.profile.loot.toTrade = Raiduku.db.profile.loot.toTrade or {}
+    Raiduku.db.profile.loot.linked = Raiduku.db.profile.loot.linked or nil
+    Raiduku.db.profile.loot.onBoss = Raiduku.db.profile.loot.onBoss or {}
+    Raiduku.db.profile.loot.inBags = Raiduku.db.profile.loot.inBags or {}
+    Raiduku.db.profile.loot.toTrade = Raiduku.db.profile.loot.toTrade or {}
 
     Raiduku.LootLinked = Raiduku.db.profile.loot.linked
     Raiduku.LootsOnBoss = Raiduku.db.profile.loot.onBoss
@@ -139,7 +139,7 @@ function Raiduku:OnInitialize()
         end
     end
 
-    Raiduku:DebugLoots()
+    -- Raiduku:DebugLoots()
 end
 
 function Raiduku:OnEnable()
@@ -399,10 +399,18 @@ function Raiduku:UseContainerItem(containerIndex, slotIndex, unitToken, reagentB
     return useContainerItem(containerIndex, slotIndex, unitToken, reagentBankOpen)
 end
 
+function Raiduku:GetContainerItemId(bagId, slotId)
+    local containerInfo = Raiduku:GetContainerItemInfo(bagId, slotId)
+    if type(containerInfo) == "table" then
+        return containerInfo.itemID
+    end
+    return select(10, containerInfo)
+end
+
 function Raiduku:GetContainerPosition(itemId)
     for bag = 0, NUM_BAG_SLOTS do
         for slot = 1, Raiduku:GetContainerNumSlots(bag) do
-            local currentItemId = select(10, Raiduku:GetContainerItemInfo(bag, slot))
+            local currentItemId = Raiduku:GetContainerItemId(bag, slot)
             if currentItemId == tonumber(itemId) then
                 return bag, slot
             end
@@ -415,7 +423,7 @@ function Raiduku:GetBagItemIds()
     local itemIds = {}
     for bag = 0, NUM_BAG_SLOTS do
         for slot = 1, Raiduku:GetContainerNumSlots(bag) do
-            local itemId = select(10, Raiduku:GetContainerItemInfo(bag, slot))
+            local itemId = Raiduku:GetContainerItemId(bag, slot)
             if itemId then
                 itemIds[itemId] = true
             end
