@@ -64,6 +64,7 @@ local function resetAll()
     Raiduku.LootWindow:Hide()
 end
 
+
 local function startNextLootInBags()
     Raiduku:NewTimer(0.2, function()
         if Raiduku:GetTableSize(Raiduku.LootsInBags) > 0 then

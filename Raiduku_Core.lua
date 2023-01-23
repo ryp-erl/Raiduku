@@ -4,7 +4,7 @@ Raiduku.AceGUI = Raiduku.AceGUI or LibStub("AceGUI-3.0")
 Raiduku.ST = Raiduku.ST or LibStub("ScrollingTable");
 
 Raiduku.name = "Raiduku"
-Raiduku.version = "2.0.0+wotlkc"
+Raiduku.version = "2.0.1+wotlkc"
 
 Raiduku.Constants = Raiduku.Constants or {
     ["LOOT_MODE_ROLL"] = 1,
@@ -400,6 +400,7 @@ function Raiduku:UseContainerItem(containerIndex, slotIndex, unitToken, reagentB
     local useContainerItem = UseContainerItem or (C_Container and C_Container.UseContainerItem)
     return useContainerItem(containerIndex, slotIndex, unitToken, reagentBankOpen)
 end
+
 
 function Raiduku:GetContainerItemId(bagId, slotId)
     local containerInfo = Raiduku:GetContainerItemInfo(bagId, slotId)
