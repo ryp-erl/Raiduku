@@ -34,6 +34,7 @@ Raiduku.defaults = {
         recyclerReminder = false,
         reverseRollOrder = false,
         enableSoftPrios = false,
+        autoLootAndStart = false,
         interface = {}
     }
 }
@@ -89,6 +90,57 @@ function Raiduku:OnInitialize()
             end
         end
     end
+    -- Raiduku.db.profile.loot.linked = nil
+    -- Raiduku.db.profile.loot.onBoss = {}
+    -- Raiduku.db.profile.loot.inBags = {}
+    -- Raiduku.db.profile.loot.toTrade = {}
+
+    Raiduku.db.profile.loot.linked = Raiduku.db.profile.loot.linked or nil
+    Raiduku.db.profile.loot.onBoss = Raiduku.db.profile.loot.onBoss or {}
+    Raiduku.db.profile.loot.inBags = Raiduku.db.profile.loot.inBags or {}
+    Raiduku.db.profile.loot.toTrade = Raiduku.db.profile.loot.toTrade or {}
+
+    Raiduku.LootLinked = Raiduku.db.profile.loot.linked
+    Raiduku.LootsOnBoss = Raiduku.db.profile.loot.onBoss
+    Raiduku.LootsInBags = Raiduku.db.profile.loot.inBags
+    Raiduku.LootsToTrade = Raiduku.db.profile.loot.toTrade
+
+    local attributedItems = {}
+    local currentDate = self:GetCurrentDate()
+    if Raiduku.db.profile.loot[currentDate] then
+        for _, csvRow in next, Raiduku.db.profile.loot[currentDate] do
+            local name = select(1, strsplit(",", csvRow))
+            local itemId = select(3, strsplit(",", csvRow))
+            local itemLink = select(2, GetItemInfo(itemId))
+            if name ~= UnitName("player") then
+                attributedItems[itemLink] = true
+            end
+        end
+    end
+    local yesterdayDate = Raiduku:GetYesterdayDate()
+    if Raiduku.db.profile.loot[yesterdayDate] then
+        for _, csvRow in next, Raiduku.db.profile.loot[yesterdayDate] do
+            local name = select(1, strsplit(",", csvRow))
+            local itemId = select(3, strsplit(",", csvRow))
+            local itemLink = select(2, GetItemInfo(itemId))
+            if name ~= UnitName("player") then
+                attributedItems[itemLink] = true
+            end
+        end
+    end
+
+    local tradeableItems = Raiduku:GetTradeableItems()
+    for itemLink in next, tradeableItems do
+        if attributedItems[itemLink] then
+            Raiduku.LootsToTrade[itemLink] = {}
+        else
+            if not Raiduku.LootsInBags[itemLink] then
+                Raiduku.LootsInBags[itemLink] = {}
+            end
+        end
+    end
+
+    -- Raiduku:DebugLoots()
 end
 
 function Raiduku:OnEnable()
@@ -96,6 +148,7 @@ function Raiduku:OnEnable()
     self:RegisterEvent("UPDATE_INSTANCE_INFO")
     self:UpdateMainLooter()
     self:UpdateInstanceInfo()
+    self:Print(Raiduku.L["new-feature-autolootandstart"])
 end
 
 function Raiduku:OnDisable()
@@ -287,8 +340,20 @@ function Raiduku:GetNumSoftRes()
     return numSoftRes
 end
 
+function Raiduku:GetTableSize(table)
+    local count = 0
+    for _ in next, table do
+        count = count + 1
+    end
+    return count
+end
+
 function Raiduku:GetCurrentDate()
     return date("%F")
+end
+
+function Raiduku:GetYesterdayDate()
+    return date("%F", time() - 24 * 60 * 60)
 end
 
 function Raiduku:GetCurrentDateTime()
@@ -336,10 +401,19 @@ function Raiduku:UseContainerItem(containerIndex, slotIndex, unitToken, reagentB
     return useContainerItem(containerIndex, slotIndex, unitToken, reagentBankOpen)
 end
 
+
+function Raiduku:GetContainerItemId(bagId, slotId)
+    local containerInfo = Raiduku:GetContainerItemInfo(bagId, slotId)
+    if type(containerInfo) == "table" then
+        return containerInfo.itemID
+    end
+    return select(10, containerInfo)
+end
+
 function Raiduku:GetContainerPosition(itemId)
     for bag = 0, NUM_BAG_SLOTS do
         for slot = 1, Raiduku:GetContainerNumSlots(bag) do
-            local currentItemId = select(10, Raiduku:GetContainerItemInfo(bag, slot))
+            local currentItemId = Raiduku:GetContainerItemId(bag, slot)
             if currentItemId == tonumber(itemId) then
                 return bag, slot
             end
@@ -352,7 +426,7 @@ function Raiduku:GetBagItemIds()
     local itemIds = {}
     for bag = 0, NUM_BAG_SLOTS do
         for slot = 1, Raiduku:GetContainerNumSlots(bag) do
-            local itemId = select(10, Raiduku:GetContainerItemInfo(bag, slot))
+            local itemId = Raiduku:GetContainerItemId(bag, slot)
             if itemId then
                 itemIds[itemId] = true
             end
@@ -385,4 +459,95 @@ end
 
 function Raiduku:NewTimer(seconds, callback)
     return C_Timer.NewTimer(seconds, callback) or C_Timer.NewTicker(seconds, callback, 1)
+end
+
+function Raiduku:IsTradeable(item)
+    local itemId = tonumber(item)
+    local itemLink = nil
+    if itemId then
+        itemLink = select(2, GetItemInfo(item))
+    else
+        itemLink = item
+    end
+    if itemLink then
+        local tradeableItems = Raiduku:GetTradeableItems()
+        return tradeableItems[itemLink]
+    end
+end
+
+function Raiduku:GetTradeableItems()
+    local tradeableItems = {}
+    for bag = 0, NUM_BAG_SLOTS do
+        for slot = 1, Raiduku:GetContainerNumSlots(bag) do
+            local _, itemLink, remainingTime = Raiduku:GetRemainingTime(bag, slot)
+            if itemLink and remainingTime then
+                tradeableItems[itemLink] = true
+            end
+        end
+    end
+    return tradeableItems
+end
+
+-- From VoraciousGhost Weak Aura: https://wago.io/TradeableLootTimers
+-- Updated to work with Phase 2 API Changes
+function Raiduku:GetRemainingTime(bagID, slot)
+    local tooltip_name = "Raiduku_Tooltip_Scanner_" .. bagID .. "_" .. slot
+    local tip = _G[tooltip_name]
+    if not tip then
+        tip = CreateFrame("GameTooltip", tooltip_name, nil, "GameTooltipTemplate")
+        tip:SetOwner(WorldFrame, "ANCHOR_NONE")
+    end
+
+    local time_formats = {
+        [INT_SPELL_DURATION_HOURS] = 60 * 60,
+        [INT_SPELL_DURATION_MIN] = 60,
+        [INT_SPELL_DURATION_SEC] = 1
+    }
+
+    local time_lookup = {}
+    for pattern, coefficient in pairs(time_formats) do
+        local prefix = ""
+        pattern = pattern:gsub("%%d(%s?)", function(s)
+            prefix = "(%d+)" .. s
+            return ""
+        end)
+
+        pattern = pattern:gsub("|4", ""):gsub("[:;]", " ")
+
+        for s in pattern:gmatch("(%S+)") do
+            time_lookup[prefix .. s] = coefficient
+        end
+    end
+
+    local needle = BIND_TRADE_TIME_REMAINING:gsub("%%s", ".*")
+    local containerInfo = Raiduku:GetContainerItemInfo(bagID, slot)
+    if containerInfo then
+        local icon, quality, itemLink = containerInfo.iconFileID, containerInfo.quality, containerInfo.hyperlink
+        if quality and quality >= 3 then
+            tip:ClearLines()
+            tip:SetBagItem(bagID, slot)
+            local text
+            for i = tip:NumLines(), 1, -1 do
+                local left = _G[tooltip_name .. "TextLeft" .. i]
+                if left then
+                    text = left:GetText() or ""
+                    if text:find(needle) then
+                        break
+                    else
+                        text = nil
+                    end
+                end
+            end
+            if text then
+                local r = 0
+                for pattern, coefficient in pairs(time_lookup) do
+                    local n = text:match(pattern)
+                    if n then
+                        r = r + n * coefficient
+                    end
+                end
+                return icon, itemLink, r
+            end
+        end
+    end
 end

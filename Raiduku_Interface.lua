@@ -210,6 +210,16 @@ function Raiduku:DrawConfigurationWindow()
         Raiduku.db.profile.enableSoftPrio = softPrioCheckbox:GetValue()
     end)
     scroll:AddChild(softPrioCheckbox)
+
+    local autoLootAndStartCheckbox = Raiduku.AceGUI:Create("CheckBox")
+    autoLootAndStartCheckbox:SetRelativeWidth(1)
+    autoLootAndStartCheckbox:SetLabel(Raiduku.L["auto-loot-and-start"])
+    autoLootAndStartCheckbox:SetValue(Raiduku.db.profile.autoLootAndStart)
+    autoLootAndStartCheckbox:SetType("checkbox")
+    autoLootAndStartCheckbox:SetCallback("OnValueChanged", function()
+        Raiduku.db.profile.autoLootAndStart = autoLootAndStartCheckbox:GetValue()
+    end)
+    scroll:AddChild(autoLootAndStartCheckbox)
 end
 
 function Raiduku:DrawExportWindow()
@@ -243,7 +253,9 @@ function Raiduku:DrawExportWindow()
 
     local dates = {}
     for date, _ in pairs(self.db.profile.loot) do
-        tinsert(dates, date)
+        if strmatch(date, "(%d+)-(%d+)-(%d+)") then
+            tinsert(dates, date)
+        end
     end
 
     table.sort(dates, function(left, right)
