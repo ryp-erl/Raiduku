@@ -210,6 +210,16 @@ function Raiduku:DrawConfigurationWindow()
         Raiduku.db.profile.enableSoftPrio = softPrioCheckbox:GetValue()
     end)
     scroll:AddChild(softPrioCheckbox)
+
+    local autoLootAndStartCheckbox = Raiduku.AceGUI:Create("CheckBox")
+    autoLootAndStartCheckbox:SetRelativeWidth(1)
+    autoLootAndStartCheckbox:SetLabel(Raiduku.L["auto-loot-and-start"])
+    autoLootAndStartCheckbox:SetValue(Raiduku.db.profile.autoLootAndStart)
+    autoLootAndStartCheckbox:SetType("checkbox")
+    autoLootAndStartCheckbox:SetCallback("OnValueChanged", function()
+        Raiduku.db.profile.autoLootAndStart = autoLootAndStartCheckbox:GetValue()
+    end)
+    scroll:AddChild(autoLootAndStartCheckbox)
 end
 
 function Raiduku:DrawExportWindow()

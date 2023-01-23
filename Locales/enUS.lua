@@ -1,5 +1,8 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Raiduku", "enUS", true)
 
+-- New features
+L["new-feature-autolootandstart"] =  "|cffffe600New feature|r: You can now auto-loot and auto-start loot attribution from bags. Go to |cffffe600/rdk config|r to enable this feature."
+
 -- Commands
 L["cmd-configure-desc"] = "Customize the addon settings"
 L["cmd-export-desc"] = "Export loot attributions as CSV for |cff1eff00thatsmybis.com|r"
@@ -54,6 +57,7 @@ L["delete-selected-dates"] = "Delete selected dates"
 L["x-dates-selected"] = "%s date(s) selected"
 L["activate-soft-prio"] = "Activate a soft-prio mode (use prios from TMB as softres)"
 L["reverse-roll-order"] = "Reverse roll order (1 becomes the strongest)"
+L["auto-loot-and-start"] = "Auto-loot items and start attribution from bags"
 
 -- Buttons
 L["now"] = "Now"

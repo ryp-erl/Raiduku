@@ -34,6 +34,7 @@ Raiduku.defaults = {
         recyclerReminder = false,
         reverseRollOrder = false,
         enableSoftPrios = false,
+        autoLootAndStart = false,
         interface = {}
     }
 }
@@ -147,6 +148,7 @@ function Raiduku:OnEnable()
     self:RegisterEvent("UPDATE_INSTANCE_INFO")
     self:UpdateMainLooter()
     self:UpdateInstanceInfo()
+    self:Print(Raiduku.L["new-feature-autolootandstart"])
 end
 
 function Raiduku:OnDisable()

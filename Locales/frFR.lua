@@ -4,6 +4,9 @@ if not L then
     return
 end
 
+-- New features
+L["new-feature-autolootandstart"] =  "|cffffe600Nouvelle fonctionnalité|r: Tu peux prendre le butin sur toi automatiquement et commencer automatiquement l'attribution du butin depuis tes sacs. Va sur |cffffe600/rdk config|r pour activer cette fonctionnalité."
+
 -- Commands
 L["cmd-configure-desc"] = "Personnalise les paramètres de l'addon"
 L["cmd-export-desc"] = "Exporte les attributions de butin au format CSV pour |cff1eff00thatsmybis.com|r"
@@ -59,6 +62,7 @@ L["delete-selected-dates"] = "Supprimer les dates selectionnées"
 L["x-dates-selected"] = "%s date(s) selectionnée(s)"
 L["activate-soft-prio"] = "Active un mode soft-prio (utilise les prios de TMB comme du softres)"
 L["reverse-roll-order"] = "Inverse l'ordre du rand (1 est le plus fort)"
+L["auto-loot-and-start"] = "Ramasser automatiquement le butin et démarrer l'attribution depuis les sacs"
 
 -- Buttons
 L["now"] = "Maintenant"
