@@ -255,7 +255,7 @@ local function chatMsgLootHandler(...)
     local itemId = loot:match("|Hitem:(%d+):")
     if itemId then
         local _, itemLink, itemQuality, _, _, itemType = GetItemInfo(itemId)
-        if itemQuality >= 3 and (Raiduku.LootItemTypes[itemType] or Raiduku.LootItemSpecials[tonumber(itemId)]) and
+        if itemQuality == 3 or itemQuality == 4 and (Raiduku.LootItemTypes[itemType] or Raiduku.LootItemSpecials[tonumber(itemId)]) and
             Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
             local alreadySaved = false
             for _, loots in next, Raiduku.db.profile.loot do
