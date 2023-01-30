@@ -14,6 +14,8 @@ Raiduku.LootItemSpecials = {
     [34845] = true
 }
 Raiduku.LootItemIgnoreList = {
+    -- Fragment of Val'anyr (safety)
+    [45038] = true,
     -- Badge of Justice
     [29434] = true,
     -- Legendaries from TK
@@ -152,7 +154,7 @@ local function lootLinkedHandler(...)
     if name == playerName and itemId and not (text:find("GG") or text:find("{rt%d}")) then
         local _, itemLink, itemRarity = GetItemInfo(itemId)
         local itemBindType = select(14, GetItemInfo(itemId))
-        if itemRarity >= 3 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
+        if itemRarity == 3  or itemRarity == 4  and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
             Raiduku.Players = {}
             Raiduku.LootLinked = itemLink
             -- after a reload or getting disconnected we might lose the info of items in bags
@@ -322,7 +324,7 @@ local function lootOpenedHandler()
                 local rarityFromConfig = Raiduku.db.profile.autoAwardRare and 4 or 3
                 local itemRarity = select(3, GetItemInfo(itemLink))
                 local itemId = itemLink:match("|Hitem:(%d+):")
-                if itemRarity >= rarityFromConfig and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil
+                if itemRarity == rarityFromConfig and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil
                     and Raiduku.LootItemResources[tonumber(itemId)] == nil then
                     tinsert(loots, itemLink)
                 end
