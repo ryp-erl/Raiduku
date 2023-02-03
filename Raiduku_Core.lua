@@ -90,10 +90,13 @@ function Raiduku:OnInitialize()
             end
         end
     end
-    -- Raiduku.db.profile.loot.linked = nil
-    -- Raiduku.db.profile.loot.onBoss = {}
-    -- Raiduku.db.profile.loot.inBags = {}
-    -- Raiduku.db.profile.loot.toTrade = {}
+
+    -- Let's reset everything, saving it caused to many issues
+    -- Will be removed in a future version.
+    Raiduku.db.profile.loot.linked = nil
+    Raiduku.db.profile.loot.onBoss = {}
+    Raiduku.db.profile.loot.inBags = {}
+    Raiduku.db.profile.loot.toTrade = {}
 
     Raiduku.db.profile.loot.linked = Raiduku.db.profile.loot.linked or nil
     Raiduku.db.profile.loot.onBoss = Raiduku.db.profile.loot.onBoss or {}
@@ -400,7 +403,6 @@ function Raiduku:UseContainerItem(containerIndex, slotIndex, unitToken, reagentB
     local useContainerItem = UseContainerItem or (C_Container and C_Container.UseContainerItem)
     return useContainerItem(containerIndex, slotIndex, unitToken, reagentBankOpen)
 end
-
 
 function Raiduku:GetContainerItemId(bagId, slotId)
     local containerInfo = Raiduku:GetContainerItemInfo(bagId, slotId)
