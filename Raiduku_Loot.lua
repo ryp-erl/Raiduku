@@ -14,6 +14,8 @@ Raiduku.LootItemSpecials = {
     [34845] = true
 }
 Raiduku.LootItemIgnoreList = {
+    -- Shadowfrost Shard (safety)
+    [50274] = true,
     -- Fragment of Val'anyr (safety)
     [45038] = true,
     -- Badge of Justice
@@ -533,7 +535,7 @@ function Raiduku:GetNumAlreadyLooted(playerName)
     if historyTable then
         for _, csvRow in next, historyTable do
             local name, note = select(1, strsplit(",", csvRow)), select(5, strsplit(",", csvRow))
-            if playerName == name and note ~= "OS" then
+            if playerName == name and note == "MS" then
                 count = count + 1
             end
         end
@@ -542,7 +544,7 @@ function Raiduku:GetNumAlreadyLooted(playerName)
     if Raiduku.db.profile.loot[yesterdayDate] then
         for _, csvRow in next, Raiduku.db.profile.loot[yesterdayDate] do
             local name, note = select(1, strsplit(",", csvRow)), select(5, strsplit(",", csvRow))
-            if playerName == name and note ~= "OS" then
+            if playerName == name and note == "MS" then
                 count = count + 1
             end
         end
@@ -746,8 +748,8 @@ end
 function Raiduku:SaveLootForTMB(loot, winner)
     local currentDate = self:GetCurrentDate()
     local itemId = loot:match("|Hitem:(%d+):")
-    local itemName, itemLink = GetItemInfo(itemId)
-    local note = winner.plus and winner.plus > 1 and "OS" or ""
+    local itemName, itemLink, itemType = select(1,GetItemInfo(itemId)), select(2,GetItemInfo(itemId)),select(12,GetItemInfo(itemId))
+    local note = winner.plus and winner.plus > 1 and "OS" or itemType == 9 and "Recipe" or winner.plus == 1 and "MS" or ""
     local csvRow = strjoin(",", winner.name, self:GetCurrentDate(), itemId, itemName, note)
     self.db.profile.loot[currentDate] = self.db.profile.loot[currentDate] or {}
     local alreadySaved = false
