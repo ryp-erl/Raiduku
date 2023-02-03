@@ -318,7 +318,9 @@ function Raiduku:DrawExportWindow()
         if #selectedDates > 0 then
             local refreshDates = {}
             for date, _ in pairs(self.db.profile.loot) do
-                tinsert(refreshDates, date)
+                if strmatch(date, "(%d+)-(%d+)-(%d+)") then
+                    tinsert(refreshDates, date)
+                end
             end
 
             table.sort(refreshDates, function(left, right)
