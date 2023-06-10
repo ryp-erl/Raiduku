@@ -1,8 +1,8 @@
 ## Author: Ryp <En Roue Libre>
 ## Interface: 30400
 ## Notes: Minimalist addon to help raid leaders managing loots and prios in WotLK Classic. 
-## Title: Raiduku |c56BBF0[WotLK]|r |cFF0099FFv2.1.2+wotlkc|r
-## Version: 2.1.2+wotlkc
+## Title: Raiduku |cFF56BBF0[WotLK]|r |cFF0099FFv2.1.3+wotlkc|r
+## Version: 2.1.3+wotlkc
 ## SavedVariables: RaidukuLootDB
 ## OptionalDeps: Ace3
 ## X-Embed: Ace3
