@@ -4,7 +4,7 @@ Raiduku.AceGUI = Raiduku.AceGUI or LibStub("AceGUI-3.0")
 Raiduku.ST = Raiduku.ST or LibStub("ScrollingTable");
 
 Raiduku.name = "Raiduku"
-Raiduku.version = "2.1.4+wotlkc"
+Raiduku.version = "2.1.5+wotlkc"
 
 Raiduku.Constants = Raiduku.Constants or {
     ["LOOT_MODE_ROLL"] = 1,
