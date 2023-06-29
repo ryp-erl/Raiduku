@@ -18,6 +18,8 @@ Raiduku.LootItemIgnoreList = {
     [50274] = true,
     -- Fragment of Val'anyr (safety)
     [45038] = true,
+    -- Abyss Crystal
+    [34057] = true,
     -- Badge of Justice
     [29434] = true,
     -- Legendaries from TK
@@ -31,6 +33,8 @@ Raiduku.LootItemIgnoreList = {
     [30317] = true
 }
 Raiduku.LootItemResources = {
+    -- LK Phase 3 Crusader Orb
+    [47556] = true,
     -- LK Phase 2 Runed Orb
     [45087] = true,
     -- BC Phase 3 Epic Gems
