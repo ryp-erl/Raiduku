@@ -11,7 +11,13 @@ Raiduku.LootItemTypes = {
 }
 Raiduku.LootItemSpecials = {
     [32385] = true,
-    [34845] = true
+    [34845] = true,
+    [43345] = true,
+    [49294] = true,
+    [49295] = true,
+    [43346] = true,
+    [49644] = true,
+    [49643] = true,
 }
 Raiduku.LootItemIgnoreList = {
     -- Shadowfrost Shard (safety)
@@ -457,7 +463,7 @@ function Raiduku:DebugLoots()
                     playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
                 end
                 local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or
-                prefix .. item
+                    prefix .. item
                 Raiduku:Print(itemAndPlayers)
             end
         end
@@ -469,13 +475,13 @@ function Raiduku:DebugLoots()
                     playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
                 end
                 local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or
-                prefix .. item
+                    prefix .. item
                 Raiduku:Print(itemAndPlayers)
             end
         end
         if Raiduku.LootsToTrade then
             Raiduku:Print(prefix ..
-            "Loots to |cff00ccfftrade|r: (" .. Raiduku:GetTableSize(Raiduku.LootsToTrade) .. "): ")
+                "Loots to |cff00ccfftrade|r: (" .. Raiduku:GetTableSize(Raiduku.LootsToTrade) .. "): ")
             for _, item in next, Raiduku.LootsToTrade do
                 Raiduku:Print(prefix .. item)
             end
