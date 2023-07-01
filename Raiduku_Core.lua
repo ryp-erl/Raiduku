@@ -6,17 +6,6 @@ Raiduku.ST = Raiduku.ST or LibStub("ScrollingTable");
 Raiduku.name = "Raiduku"
 Raiduku.version = "2.1.6+wotlkc"
 
-Raiduku.Constants = Raiduku.Constants or {
-    ["LOOT_MODE_ROLL"] = 1,
-    ["LOOT_MODE_PRIO"] = 2,
-    ["LOOT_MODE_SOFTPRIO"] = 3,
-    ["LOOT_MODE_SOFTRES"] = 4,
-}
-Raiduku.ItemBindType = Raiduku.ItemBindType or {
-    ["BIND_WHEN_PICKED_UP"] = 1,
-    ["BIND_WHEN_EQUIPPED"] = 2,
-}
-
 --[[
     Initializing the addon using Ace3.
     It includes options, commands, saved variables and basic events to register to.

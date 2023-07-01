@@ -15,6 +15,7 @@ Locales\Locales.xml
 
 # Addon files
 Raiduku_Core.lua
+Raiduku_Constants.lua
 Raiduku_Parse.lua
 Raiduku_Interface.lua
 Raiduku_Loot.lua
