@@ -1,13 +1,15 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Raiduku", "enUS", true)
 
 -- New features
-L["new-feature-autolootandstart"] =  "|cffffe600New feature|r: You can now auto-loot and auto-start loot attribution from bags. Go to |cffffe600/rdk config|r to enable this feature."
+L["new-feature-autolootandstart"] =
+"|cffffe600New feature|r: You can now auto-loot and auto-start loot attribution from bags. Go to |cffffe600/rdk config|r to enable this feature."
 
 -- Commands
 L["cmd-configure-desc"] = "Customize the addon settings"
 L["cmd-export-desc"] = "Export loot attributions as CSV for |cff1eff00thatsmybis.com|r"
 L["cmd-prios-desc"] = "Import loot priorities as CSV from |cff1eff00thatsmybis.com|r"
 L["cmd-softres-desc"] = "Import loot softres as CSV from |cff1eff00softres.it|r"
+L["toggle-debug-desc"] = "Toggle debug mode"
 
 -- Infos
 L["export-data-reminder"] = "You can export loot data for |cff1eff00thatsmybis.com|r using |cffffe600/rdk export|r"

@@ -160,7 +160,7 @@ local function lootLinkedHandler(...)
     if name == playerName and itemId and not (text:find("GG") or text:find("{rt%d}")) then
         local _, itemLink, itemRarity = GetItemInfo(itemId)
         local itemBindType = select(14, GetItemInfo(itemId))
-        if itemRarity == 3  or itemRarity == 4  and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
+        if itemRarity == 3 or itemRarity == 4 and Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
             Raiduku.Players = {}
             Raiduku.LootLinked = itemLink
             -- after a reload or getting disconnected we might lose the info of items in bags
@@ -253,7 +253,7 @@ local function lootLinkedHandler(...)
                 Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
             end
             Raiduku.LootWindow:Show()
-            -- Raiduku:DebugLoots()
+            Raiduku:DebugLoots()
         end
     end
 end
@@ -263,6 +263,7 @@ local function chatMsgLootHandler(...)
     local itemId = loot:match("|Hitem:(%d+):")
     if itemId then
         local _, itemLink, itemQuality, _, _, itemType = GetItemInfo(itemId)
+        Raiduku:Print(receiver .. " received " .. itemLink)
         if itemQuality == 3 or itemQuality == 4 and (Raiduku.LootItemTypes[itemType] or Raiduku.LootItemSpecials[tonumber(itemId)]) and
             Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
             local alreadySaved = false
@@ -299,7 +300,7 @@ local function playerRollHandler(...)
         end
         if Raiduku.LootMode ~= Raiduku.Constants.LOOT_MODE_PRIO then
             Raiduku:UpdatePlusRollResults()
-            -- Raiduku:DebugLoots()
+            Raiduku:DebugLoots()
         end
     end
 end
@@ -316,7 +317,7 @@ local function playerPlusHandler(...)
         if loots and plus and not (text:find("GG") or text:find("{rt%d}")) then
             Raiduku:AddOrUpdatePlayer(name, plus)
             Raiduku:UpdatePlusRollResults()
-            -- Raiduku:DebugLoots()
+            Raiduku:DebugLoots()
         end
     end
 end
@@ -442,37 +443,42 @@ end)
 --]]
 
 function Raiduku:DebugLoots()
-    local prefix = "|cffffe600[DEBUG]|r "
-    if Raiduku.LootLinked then
-        Raiduku:Print(prefix .. "Loot linked:")
-        Raiduku:Print(prefix .. Raiduku.LootLinked)
-    end
-    if Raiduku.LootsOnBoss then
-        Raiduku:Print(prefix .. "Loots on |cffcc1919boss|r (" .. Raiduku:GetTableSize(Raiduku.LootsOnBoss) .. "): ")
-        for item, players in next, Raiduku.LootsOnBoss do
-            local playerNames = ""
-            for _, player in next, players do
-                playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
-            end
-            local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or prefix .. item
-            Raiduku:Print(itemAndPlayers)
+    if Raiduku.db.profile.debug then
+        local prefix = "|cffffe600[DEBUG]|r "
+        if Raiduku.LootLinked then
+            Raiduku:Print(prefix .. "Loot linked:")
+            Raiduku:Print(prefix .. Raiduku.LootLinked)
         end
-    end
-    if Raiduku.LootsInBags then
-        Raiduku:Print(prefix .. "Loots in |cff40c040bags|r: (" .. Raiduku:GetTableSize(Raiduku.LootsInBags) .. "): ")
-        for item, players in next, Raiduku.LootsInBags do
-            local playerNames = ""
-            for _, player in next, players do
-                playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
+        if Raiduku.LootsOnBoss then
+            Raiduku:Print(prefix .. "Loots on |cffcc1919boss|r (" .. Raiduku:GetTableSize(Raiduku.LootsOnBoss) .. "): ")
+            for item, players in next, Raiduku.LootsOnBoss do
+                local playerNames = ""
+                for _, player in next, players do
+                    playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
+                end
+                local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or
+                prefix .. item
+                Raiduku:Print(itemAndPlayers)
             end
-            local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or prefix .. item
-            Raiduku:Print(itemAndPlayers)
         end
-    end
-    if Raiduku.LootsToTrade then
-        Raiduku:Print(prefix .. "Loots to |cff00ccfftrade|r: (" .. Raiduku:GetTableSize(Raiduku.LootsToTrade) .. "): ")
-        for _, item in next, Raiduku.LootsToTrade do
-            Raiduku:Print(prefix .. item)
+        if Raiduku.LootsInBags then
+            Raiduku:Print(prefix .. "Loots in |cff40c040bags|r: (" .. Raiduku:GetTableSize(Raiduku.LootsInBags) .. "): ")
+            for item, players in next, Raiduku.LootsInBags do
+                local playerNames = ""
+                for _, player in next, players do
+                    playerNames = #playerNames > 0 and playerNames .. ", " .. player[1] or playerNames .. player[1]
+                end
+                local itemAndPlayers = #playerNames > 0 and prefix .. item .. " (" .. playerNames .. ")" or
+                prefix .. item
+                Raiduku:Print(itemAndPlayers)
+            end
+        end
+        if Raiduku.LootsToTrade then
+            Raiduku:Print(prefix ..
+            "Loots to |cff00ccfftrade|r: (" .. Raiduku:GetTableSize(Raiduku.LootsToTrade) .. "): ")
+            for _, item in next, Raiduku.LootsToTrade do
+                Raiduku:Print(prefix .. item)
+            end
         end
     end
 end
@@ -660,7 +666,7 @@ function Raiduku:Award(lootIndex, playerName)
             end
         end
     end
-    -- Raiduku:DebugLoots()
+    Raiduku:DebugLoots()
 end
 
 function Raiduku:GetSoftResList(itemId)
@@ -752,8 +758,10 @@ end
 function Raiduku:SaveLootForTMB(loot, winner)
     local currentDate = self:GetCurrentDate()
     local itemId = loot:match("|Hitem:(%d+):")
-    local itemName, itemLink, itemType = select(1,GetItemInfo(itemId)), select(2,GetItemInfo(itemId)),select(12,GetItemInfo(itemId))
-    local note = winner.plus and winner.plus > 1 and "OS" or itemType == 9 and "Recipe" or winner.plus == 1 and "MS" or ""
+    local itemName, itemLink, itemType = select(1, GetItemInfo(itemId)), select(2, GetItemInfo(itemId)),
+        select(12, GetItemInfo(itemId))
+    local note = winner.plus and winner.plus > 1 and "OS" or itemType == 9 and "Recipe" or winner.plus == 1 and "MS" or
+        ""
     local csvRow = strjoin(",", winner.name, self:GetCurrentDate(), itemId, itemName, note)
     self.db.profile.loot[currentDate] = self.db.profile.loot[currentDate] or {}
     local alreadySaved = false

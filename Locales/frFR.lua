@@ -5,13 +5,15 @@ if not L then
 end
 
 -- New features
-L["new-feature-autolootandstart"] =  "|cffffe600Nouvelle fonctionnalité|r: Tu peux prendre le butin sur toi automatiquement et commencer automatiquement l'attribution du butin depuis tes sacs. Va sur |cffffe600/rdk config|r pour activer cette fonctionnalité."
+L["new-feature-autolootandstart"] =
+"|cffffe600Nouvelle fonctionnalité|r: Tu peux prendre le butin sur toi automatiquement et commencer automatiquement l'attribution du butin depuis tes sacs. Va sur |cffffe600/rdk config|r pour activer cette fonctionnalité."
 
 -- Commands
 L["cmd-configure-desc"] = "Personnalise les paramètres de l'addon"
 L["cmd-export-desc"] = "Exporte les attributions de butin au format CSV pour |cff1eff00thatsmybis.com|r"
 L["cmd-prios-desc"] = "Importe les priorités de butin au format CSV depuis |cff1eff00thatsmybis.com|r"
 L["cmd-softres-desc"] = "Importe les réservations de butin au format CSV depuis |cff1eff00softres.it|r"
+L["toggle-debug-desc"] = "Active ou désactive le mode debug"
 
 -- Infos
 L["export-data-reminder"] =

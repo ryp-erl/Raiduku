@@ -24,18 +24,19 @@ Raiduku.ItemBindType = Raiduku.ItemBindType or {
 
 Raiduku.defaults = {
     profile = {
-        loot = {},
-        prios = {},
-        softres = {},
-        lastImport = {},
-        lastRecycler = nil,
-        autoAwardCommon = true,
-        autoAwardRare = true,
+        loot             = {},
+        prios            = {},
+        softres          = {},
+        lastImport       = {},
+        lastRecycler     = nil,
+        autoAwardCommon  = true,
+        autoAwardRare    = true,
         recyclerReminder = false,
         reverseRollOrder = false,
-        enableSoftPrios = false,
+        enableSoftPrios  = false,
         autoLootAndStart = false,
-        interface = {}
+        interface        = {},
+        debug            = false
     }
 }
 
@@ -67,6 +68,12 @@ Raiduku.options = {
             name = "SoftRes",
             desc = Raiduku.L["cmd-softres-desc"],
             func = "ImportSoftRes"
+        },
+        debug = {
+            type = "execute",
+            name = "ToggleDebug",
+            desc = Raiduku.L["toggle-debug-desc"],
+            func = "ToggleDebug"
         }
     }
 }
@@ -78,6 +85,12 @@ function Raiduku:OnInitialize()
     self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Raiduku", "Raiduku")
     self:RegisterChatCommand("Raiduku", "ChatCommand")
     self:RegisterChatCommand("rdk", "ChatCommand")
+
+    if Raiduku.db.profile.debug then
+        Raiduku:Print("Debug |cff33ff00on|r")
+    else
+        Raiduku:Print("Debug |cffff0000off|r")
+    end
 
     Raiduku.recycler = UnitName("player")
 
@@ -143,7 +156,7 @@ function Raiduku:OnInitialize()
         end
     end
 
-    -- Raiduku:DebugLoots()
+    Raiduku:DebugLoots()
 end
 
 function Raiduku:OnEnable()
@@ -271,6 +284,15 @@ function Raiduku:ImportSoftRes()
         frame:SetStatusText(status)
         removeAllButton:SetDisabled(true)
     end)
+end
+
+function Raiduku:ToggleDebug()
+    Raiduku.db.profile.debug = not Raiduku.db.profile.debug
+    if Raiduku.db.profile.debug then
+        Raiduku:Print("Debug |cff33ff00on|r")
+    else
+        Raiduku:Print("Debug |cffff0000off|r")
+    end
 end
 
 --[[
