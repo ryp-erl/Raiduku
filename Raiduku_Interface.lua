@@ -440,21 +440,6 @@ end
     Static popups
 --]]
 
-StaticPopupDialogs["RDK_CONFIRM_SAVE_FOR_TMB"] = {
-    text = Raiduku.L["confirm-manual-award-save-for-tmb"],
-    button1 = Raiduku.L["yes"],
-    button2 = Raiduku.L["no"],
-    OnAccept = function(_, data, data2)
-        Raiduku:SaveLootForTMB(data, {
-            name = data2
-        })
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3
-}
-
 StaticPopupDialogs["RDK_CONFIRM_RECYCLER"] = {
     text = Raiduku.L["change-recycler"],
     button1 = Raiduku.L["yes"],

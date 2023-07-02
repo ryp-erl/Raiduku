@@ -23,8 +23,6 @@ L["recycler-is-now"] = "Recycler is now |cffff8000%s|r"
 L["change-recycler"] = "The recycler is |cffff8000%s|r. Do you want to change it?"
 L["to-change-recycler-run"] = "To change the recycler, run |cffffe600/rdk config|r"
 L["cannot-award-to"] = "|cffff0000Cannot award loot to|r %s"
-L["confirm-manual-award-save-for-tmb"] =
-"%s has been manually awarded to |cffff8000%s|r.\nDo you want to save this info for |cff1eff00thatsmybis.com|r anyway?"
 L["prios-saved"] = "prios |cff33ff00saved|r"
 L["softres-saved"] = "softres |cff33ff00saved|r"
 L["prios-found"] = "prios |cff33ff00found|r"

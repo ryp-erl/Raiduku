@@ -28,8 +28,6 @@ L["recycler-is-now"] = "Le responsable du recyclage est maintenant |cffff8000%s|
 L["change-recycler"] = "Le responsable du recyclage est |cffff8000%s|r. Est-ce que tu veux le changer?"
 L["to-change-recycler-run"] = "Pour changer de responsable du recyclage, lance |cffffe600/rdk config|r"
 L["cannot-award-to"] = "|cffff0000Impossible d'attribuer le butin à |r %s"
-L["confirm-manual-award-save-for-tmb"] =
-"%s a été attribué manuellement à |cffff8000%s|r.\nEst-ce que tu veux quand même sauvegarder l'information pour |cff1eff00thatsmybis.com|r ?"
 L["prios-saved"] = "priorités |cff33ff00enregistrées|r"
 L["softres-saved"] = "réservations |cff33ff00enregistrées|r"
 L["prios-found"] = "priorités |cff33ff00trouvées|r"

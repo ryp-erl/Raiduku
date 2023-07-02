@@ -179,13 +179,13 @@ local function lootLinkedHandler(...)
                     Raiduku.LootWindow.winnerButton:SetEnabled(true)
                 end
                 if Raiduku.db.profile.enableSoftPrio then
-                    Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTPRIO
+                    Raiduku.LootMode = Raiduku.LootModes.LOOT_MODE_SOFTPRIO
                     if #prioNames > 0 then
                         SendChatMessage("{rt2} Soft Prios {rt2}", Raiduku:GetChatType(), nil, nil)
                         SendChatMessage(table.concat(prioNames, ", "), Raiduku:GetChatType(), nil, nil)
                     end
                 else
-                    Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_PRIO
+                    Raiduku.LootMode = Raiduku.LootModes.LOOT_MODE_PRIO
                     if Raiduku:GetTableSize(prioTableData) > 0 then
                         SendChatMessage("{rt2} Prios {rt2}", Raiduku:GetChatType(), nil, nil)
                         for _, prio in ipairs(prioTableData) do
@@ -199,10 +199,10 @@ local function lootLinkedHandler(...)
                     end
                 end
             elseif #Raiduku.SoftResList > 0 then
-                Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_SOFTRES
+                Raiduku.LootMode = Raiduku.LootModes.LOOT_MODE_SOFTRES
                 displaySoftResInfo()
             else
-                Raiduku.LootMode = Raiduku.Constants.LOOT_MODE_ROLL
+                Raiduku.LootMode = Raiduku.LootModes.LOOT_MODE_ROLL
             end
             Raiduku.LootWindow:Show()
             Raiduku:DebugLoots()
@@ -214,28 +214,16 @@ local function chatMsgLootHandler(...)
     local loot, receiver = select(1, ...), select(5, ...)
     local itemId = loot:match("|Hitem:(%d+):")
     if itemId then
-        local _, itemLink, itemQuality, _, _, itemType = GetItemInfo(itemId)
-        Raiduku:Print(receiver .. " received " .. itemLink)
-        if itemQuality == 3 or itemQuality == 4 and (Raiduku.LootItemTypes[itemType] or Raiduku.LootItemSpecials[tonumber(itemId)]) and
-            Raiduku.LootItemIgnoreList[tonumber(itemId)] == nil then
-            local alreadySaved = false
-            for _, loots in next, Raiduku.db.profile.loot do
-                for _, row in next, loots do
-                    local name, _, curItemId = strsplit(",", row)
-                    if receiver == name and itemId == curItemId then
-                        alreadySaved = true
-                    end
-                end
-            end
-            if not alreadySaved then
-                local dialog = StaticPopup_Show("RDK_CONFIRM_SAVE_FOR_TMB", itemLink, receiver)
-                if (dialog) then
-                    dialog.data = loot
-                    dialog.data2 = receiver
-                end
-            end
+        local itemLink = select(2, GetItemInfo(itemId))
+        if Raiduku.LootsOnBoss[itemLink] then
+            Raiduku:SaveLootForTMB(itemLink, {
+                name = receiver
+            })
+            Raiduku.LootsOnBoss[itemLink] = nil
+            startNextLootOnBoss()
         end
     end
+    Raiduku:DebugLoots()
 end
 
 local function playerRollHandler(...)
@@ -250,7 +238,7 @@ local function playerRollHandler(...)
                 player.roll = roll
             end
         end
-        if Raiduku.LootMode ~= Raiduku.Constants.LOOT_MODE_PRIO then
+        if Raiduku.LootMode ~= Raiduku.LootModes.LOOT_MODE_PRIO then
             Raiduku:UpdatePlusRollResults()
             Raiduku:DebugLoots()
         end
@@ -258,8 +246,8 @@ local function playerRollHandler(...)
 end
 
 local function playerPlusHandler(...)
-    if Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_ROLL or
-        Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_SOFTPRIO then
+    if Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_ROLL or
+        Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_SOFTPRIO then
         local text, player = ...
         -- local guid = select(12, ...)
         -- local _, class = GetPlayerInfoByGUID(guid)
@@ -599,7 +587,7 @@ function Raiduku:Award(lootIndex, playerName)
         end
     end
 
-    if Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_SOFTRES then
+    if Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_SOFTRES then
         local softres = Raiduku.db.profile.softres
         if softres[itemId] then
             for index, resPlayer in next, softres[itemId] do
@@ -609,7 +597,7 @@ function Raiduku:Award(lootIndex, playerName)
                 end
             end
         end
-    elseif Raiduku.LootMode == Raiduku.Constants.LOOT_MODE_PRIO then
+    elseif Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_PRIO then
         local prios = Raiduku.db.profile.prios
         for index, prioPlayer in next, prios[itemId] do
             if playerName == prioPlayer.name then
