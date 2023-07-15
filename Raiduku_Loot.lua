@@ -238,7 +238,7 @@ local function playerRollHandler(...)
             Raiduku:AddOrUpdatePlayer(player.name, player.plus, player.order, roll)
         else
             if Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_ROLL then
-                Raiduku:AddOrUpdatePlayer(playerName, 0, nil, roll)
+                Raiduku:AddOrUpdatePlayer(playerName, 1, nil, roll)
             end
         end
         if Raiduku.LootMode ~= Raiduku.LootModes.LOOT_MODE_PRIO then
