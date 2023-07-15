@@ -233,9 +233,12 @@ local function playerRollHandler(...)
     if itemLink and text:find("(1-100)") then
         local roll = tonumber(text:match("(%d+)"))
         local playerName = strsplit(" ", text)
-        for _, player in ipairs(Raiduku.Players) do
-            if player.name == playerName and player.roll == nil then
-                player.roll = roll
+        local player = Raiduku:FindPlayerByName(playerName)
+        if player then
+            Raiduku:AddOrUpdatePlayer(player.name, player.plus, player.order, roll)
+        else
+            if Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_ROLL then
+                Raiduku:AddOrUpdatePlayer(playerName, 0, nil, roll)
             end
         end
         if Raiduku.LootMode ~= Raiduku.LootModes.LOOT_MODE_PRIO then
@@ -249,8 +252,6 @@ local function playerPlusHandler(...)
     if Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_ROLL or
         Raiduku.LootMode == Raiduku.LootModes.LOOT_MODE_SOFTPRIO then
         local text, player = ...
-        -- local guid = select(12, ...)
-        -- local _, class = GetPlayerInfoByGUID(guid)
         local name = Raiduku:GetPlayerName(player)
         local plus = tonumber(text:match("+%d"))
         local loots = Raiduku.LootsOnBoss or Raiduku.LootsInBags or nil
@@ -382,6 +383,15 @@ end)
     Module functions
 --]]
 
+function Raiduku:FindPlayerByName(name)
+    for index, player in ipairs(Raiduku.Players) do
+        if player.name == name then
+            return player, index
+        end
+    end
+    return nil, nil
+end
+
 function Raiduku:DebugLoots()
     if Raiduku.db.profile.debug then
         local prefix = "|cffffe600[DEBUG]|r "
@@ -502,22 +512,17 @@ function Raiduku:GetNumAlreadyLooted(playerName)
     return count
 end
 
-function Raiduku:AddOrUpdatePlayer(name, plus, prio)
-    local playerIndex = nil
-    for index, player in ipairs(self.Players) do
-        if player.name == name then
-            playerIndex = index
-            break
-        end
-    end
+function Raiduku:AddOrUpdatePlayer(name, plus, prio, roll)
+    local _, playerIndex = Raiduku:FindPlayerByName(name)
     if playerIndex then
-        self.Players[playerIndex].plus = plus
+        Raiduku.Players[playerIndex].plus = plus
+        Raiduku.Players[playerIndex].roll = Raiduku.Players[playerIndex].roll or roll
     else
-        table.insert(self.Players, {
+        table.insert(Raiduku.Players, {
             name = name,
             order = prio,
             plus = plus,
-            roll = nil,
+            roll = roll,
             numLooted = Raiduku:GetNumAlreadyLooted(name),
         })
     end
