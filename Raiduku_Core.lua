@@ -4,7 +4,7 @@ Raiduku.AceGUI = Raiduku.AceGUI or LibStub("AceGUI-3.0")
 Raiduku.ST = Raiduku.ST or LibStub("ScrollingTable");
 
 Raiduku.name = "Raiduku"
-Raiduku.version = "2.1.7+wotlkc"
+Raiduku.version = "2.2.0+wotlkc"
 
 --[[
     Initializing the addon using Ace3.
