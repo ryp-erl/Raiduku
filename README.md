@@ -1,8 +1,8 @@
 <img src="https://github.com/ryp-erl/assets/blob/main/Raiduku/rdk_logo.jpg?raw=true" width=50 align="right" />
 
-![version](https://img.shields.io/github/v/release/d8d9dc3/Raiduku)
-[![wiki](https://img.shields.io/badge/read-wiki-green)](https://github.com/d8d9dc3/Raiduku/wiki)
-[![issues](https://img.shields.io/badge/report-issues-blueviolet)](https://github.com/d8d9dc3/Raiduku/issues)
+![version](https://img.shields.io/github/v/release/ryp-erl/Raiduku)
+[![wiki](https://img.shields.io/badge/read-wiki-green)](https://github.com/ryp-erl/Raiduku/wiki)
+[![issues](https://img.shields.io/badge/report-issues-blueviolet)](https://github.com/ryp-erl/Raiduku/issues)
 [![curseforge](https://img.shields.io/badge/visit%20on-curseforge-orange)](https://www.curseforge.com/wow/addons/raiduku/)
 
 # Raiduku
