@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*+cataclysm-classic'
+
+jobs:
+  publish_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Zip
+        run: |
+          rm -rf .git .github README.md
+          mkdir RDK
+          ls | grep -v RDK | xargs mv -t RDK
+          mv RDK Raiduku
+          zip -r ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip Raiduku
+      - name: Upload Zip
+        id: upload_zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
+          asset_name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip
+          asset_content_type: application/zip
+      - name: "Upload to CurseForge"
+        id: upload_to_cf
+        if: steps.upload_zip.outcome == 'success'
+        uses: itsmeow/curseforge-upload@v3
+        with:
+          file_path: "${{ github.event.repository.name }}-${{ steps.vars.outputs.tag }}.zip"
+          game_endpoint: "wow"
+          game_versions: "WoW Cataclysm Classic:4.4.0"
+          project_id: 607232
+          token: "${{ secrets.CF_API_TOKEN }}"
+      - name: Rollback Release
+        if: steps.upload_zip.outcome == 'failure' || steps.upload_to_cf.outcome == 'failure'
+        uses: author/action-rollback@stable
+        with:
+          id: ${{ steps.create_release.id }}
+          tag: ${{ github.ref }}
