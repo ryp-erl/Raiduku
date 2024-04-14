@@ -1,7 +1,7 @@
 ## Author: Ryp
 ## Interface: 40400
 ## Notes: Minimalist addon to help raid leaders managing loots and prios in Cataclysm Classic. 
-## Title: Raiduku |cFF56BBF0[WotLK]|r |cFFFF640Av2.2.1-beta.1+cataclysm-classic|r
+## Title: Raiduku |cFFFF640A[Cataclysm]|r |cFFFFF468v2.2.1-beta.1|r
 ## Version: 2.2.1-beta.1+cataclysm-classic
 ## SavedVariables: RaidukuLootDB
 ## OptionalDeps: Ace3
