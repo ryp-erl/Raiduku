@@ -29,6 +29,18 @@ Raiduku.LootItemSpecials = {
 }
 
 Raiduku.LootItemIgnoreList = {
+    -- Fragment of Deathwing's Jaw Cluster for Fangs of the Father (safety)
+    [78352] = true,
+    -- Shadowy Gem Cluster for Fangs of the Father (safety)
+    [77951] = true,
+    -- Elementium Gem Cluster for Fangs of the Father (safety)
+    [77952] = true,
+    -- Heart of Flame for Dragonwrath, Tarecgosa's Rest (safety)
+    [69848] = true,
+    -- Seething Cinder for Dragonwrath, Tarecgosa's Rest (safety)
+    [69815] = true,
+    -- Eternal Ember for Dragonwrath, Tarecgosa's Rest (safety)
+    [71141] = true,
     -- Shadowfrost Shard (safety)
     [50274] = true,
     -- Fragment of Val'anyr (safety)
