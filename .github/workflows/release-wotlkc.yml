@@ -3,7 +3,7 @@ name: WotLK Classic Release
 on:
   push:
     tags:
-      - 'v*wotlkc'
+      - '*wotlkc'
 
 jobs:
   publish_wotlkc_release:

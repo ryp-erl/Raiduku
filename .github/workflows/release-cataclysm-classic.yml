@@ -3,7 +3,7 @@ name: Cataclsym Classic Release
 on:
   push:
     tags:
-      - 'v*cataclysm-classic'
+      - '*cataclysm-classic'
 
 jobs:
   publish_cataclysm_classic_release:
