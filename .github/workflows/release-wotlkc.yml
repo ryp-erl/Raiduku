@@ -1,4 +1,4 @@
-name: Release
+name: WotLK Classic Release
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - 'v**+wotlkc'
 
 jobs:
-  publish_release:
-    name: Create Release
+  publish_wotlkc_release:
+    name: Create WotLK Classic Release
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}

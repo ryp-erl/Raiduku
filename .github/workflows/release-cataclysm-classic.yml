@@ -1,4 +1,4 @@
-name: Release
+name: Cataclsym Classic Release
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - 'v**+cataclysm-classic'
 
 jobs:
-  publish_release:
-    name: Create Release
+  publish_cataclysm_classic_release:
+    name: Create Cataclsym Classic Release
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
